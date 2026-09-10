@@ -28,7 +28,7 @@ import { deltaE2000, hexToRgb, rgbToLab } from "@/lib/outfits/color";
 /** Modelo por defecto. Se puede cambiar sin tocar código con `ANTHROPIC_MODEL`. */
 const DEFAULT_MODEL = "claude-opus-5";
 
-const TaggingSchema = z.object({
+export const TaggingSchema = z.object({
   category: z.enum(CATEGORIES),
   subcategory: z
     .string()
@@ -53,7 +53,7 @@ const TaggingSchema = z.object({
   seasons: z.array(z.enum(SEASONS)).describe("Temporadas en las que se puede llevar."),
 });
 
-const SYSTEM_PROMPT = `Eres un estilista que cataloga el armario de una persona.
+export const SYSTEM_PROMPT = `Eres un estilista que cataloga el armario de una persona.
 
 Recibes la foto de una única prenda, ya recortada sobre fondo transparente, y
 devuelves sus atributos.
@@ -216,7 +216,7 @@ function reconcileColors(
   });
 }
 
-function normalize(
+export function normalize(
   parsed: z.infer<typeof TaggingSchema>,
   measured: GarmentColor[],
 ): GarmentAttributes {

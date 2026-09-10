@@ -1,10 +1,14 @@
 /**
- * Reordenado y redacción de los mejores conjuntos con Claude.
+ * Reordenado y redacción de los mejores conjuntos con un modelo.
  *
  * Es estrictamente opcional. El motor de reglas ya entrega conjuntos válidos
  * con su explicación; esto solo añade criterio de estilista y una frase mejor
  * escrita. Si falla, si no hay clave o si tarda, se devuelven los conjuntos tal
  * cual venían: la app nunca depende de este paso.
+ *
+ * Usa Claude si hay `ANTHROPIC_API_KEY` y, si no, Gemini. No hay variable para
+ * elegir: con una sola clave configurada no hay nada que decidir, y el paso es
+ * opcional de todas formas.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -12,6 +16,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import * as z from "zod/v4";
 
 import type { Outfit } from "@/lib/types";
+import { geminiJson, hasGemini } from "@/lib/ai/gemini";
 
 const DEFAULT_MODEL = "claude-opus-5";
 /** Cuántos conjuntos se mandan al modelo. Una sola llamada para todos. */
@@ -50,25 +55,13 @@ lista. Devuelve todos los conjuntos que recibas, ninguno menos.`;
  */
 export async function explainOutfits(outfits: Outfit[]): Promise<Outfit[]> {
   if (outfits.length === 0) return outfits;
-  if (!process.env.ANTHROPIC_API_KEY) return outfits;
+  if (!process.env.ANTHROPIC_API_KEY && !hasGemini()) return outfits;
 
   const head = outfits.slice(0, TOP_N);
   const tail = outfits.slice(TOP_N);
 
   try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-    const message = await client.messages.parse({
-      model: process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL,
-      max_tokens: 4000,
-      system: [
-        { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
-      ],
-      messages: [{ role: "user", content: describeOutfits(head) }],
-      output_config: { format: zodOutputFormat(RankingSchema) },
-    });
-
-    const parsed = message.parsed_output;
+    const parsed = await rank(describeOutfits(head));
     if (parsed === null) return outfits;
 
     const byId = new Map(parsed.outfits.map((entry) => [entry.id, entry]));
@@ -96,6 +89,30 @@ export async function explainOutfits(outfits: Outfit[]): Promise<Outfit[]> {
     // conjuntos, solo que con la explicación generada por reglas.
     return outfits;
   }
+}
+
+/** Pregunta al modelo que haya configurado. Claude manda si están los dos. */
+async function rank(prompt: string): Promise<z.infer<typeof RankingSchema> | null> {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+
+  if (anthropicKey) {
+    const client = new Anthropic({ apiKey: anthropicKey });
+    const message = await client.messages.parse({
+      model: process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL,
+      max_tokens: 4000,
+      system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+      messages: [{ role: "user", content: prompt }],
+      output_config: { format: zodOutputFormat(RankingSchema) },
+    });
+    return message.parsed_output;
+  }
+
+  return geminiJson(
+    process.env.GEMINI_API_KEY as string,
+    SYSTEM_PROMPT,
+    [{ text: prompt }],
+    RankingSchema,
+  );
 }
 
 /** Describe los conjuntos en texto plano, que es más barato en tokens que JSON. */

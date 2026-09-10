@@ -129,6 +129,39 @@ explicaciones de los conjuntos.
 
 ---
 
+## D. Ruta sin coste (alternativa a B y C)
+
+Ni fal.ai ni Anthropic tienen plan gratuito. Si el objetivo es probar la app
+sin pagar nada, esta combinación funciona con las limitaciones que se indican:
+
+| Pieza | Servicio gratis | Límite real |
+|---|---|---|
+| Base de datos y Storage | Supabase Free | 2 proyectos activos **por cuenta**, no por organización |
+| Recorte de fondo | remove.bg | 50 imágenes al mes, y a 0,25 MP (baja resolución) |
+| Etiquetado | Google Gemini (AI Studio) | cuota diaria gratuita, sin tarjeta |
+
+1. **Recorte**: seguir el apartado B → *Alternativas* → remove.bg, y dejar
+   `BG_REMOVAL_PROVIDER=removebg` en `.env.local`.
+2. **Etiquetado**: abrir https://aistudio.google.com/apikey, pulsar **Create API
+   key** (no pide método de pago) y copiarla en `.env.local` como
+   `GEMINI_API_KEY`. Poner además `TAGGING_PROVIDER=gemini`.
+   - El modelo por defecto es `gemini-3.5-flash`; se cambia con `GEMINI_MODEL`.
+   - La llamada vive en `src/lib/ai/gemini.ts` y valida la respuesta contra el
+     mismo esquema Zod que el proveedor de Claude, así que un JSON mal formado
+     falla igual de ruidosamente.
+   - La casilla **Afinar con IA** de `/outfits` usa la misma clave: si no hay
+     `ANTHROPIC_API_KEY`, `src/lib/outfits/explain.ts` pregunta a Gemini. Sin
+     ninguna de las dos, sigue degradando a la explicación del motor de reglas.
+3. **Supabase**: si al crear el proyecto aparece "The organization has members
+   who have exceeded their free project limits", el tope de 2 proyectos es de
+   la cuenta entera. Crear otra organización no lo esquiva: hay que pausar o
+   borrar uno de los proyectos **activos**. Los pausados no cuentan.
+
+Con `TAGGING_PROVIDER=anthropic` (el valor por defecto) todo sigue igual que
+en el apartado C.
+
+---
+
 ## Comprobar que todo funciona
 
 Con las tres claves puestas en `.env.local`:
@@ -174,6 +207,7 @@ de la variable que falta (lo genera `MissingConfigError` en
 | `MISSING_CONFIG` mencionando `FAL_KEY` (con `BG_REMOVAL_PROVIDER=fal`) | Clave de fal.ai (paso B) |
 | `MISSING_CONFIG` mencionando `PHOTOROOM_API_KEY` o `REMOVE_BG_API_KEY` | Falta la clave del proveedor de recorte que se haya elegido |
 | `MISSING_CONFIG` mencionando `ANTHROPIC_API_KEY` | Clave de Anthropic (paso C) |
+| `MISSING_CONFIG` mencionando `GEMINI_API_KEY` (con `TAGGING_PROVIDER=gemini`) | Clave de Google AI Studio (paso D) |
 | `BACKGROUND_REMOVAL_FAILED` | La clave existe pero el proveedor de recorte respondió con error (revisar saldo/cuota, o que la imagen sea un formato admitido) |
 | `TAGGING_FAILED` | Claude respondió con error o con un formato que no encaja con el esquema esperado (revisar saldo de Anthropic) |
 | `STORAGE_FAILED` / error subiendo a Supabase Storage | El bucket `garments` no existe o no es público (paso A.6) |

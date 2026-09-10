@@ -15,7 +15,7 @@ import { fail, handle, ok } from "@/lib/api";
 import { uploadImage } from "@/lib/db/supabase";
 import { removeBackground } from "@/lib/ai/background";
 import { processCutout } from "@/lib/ai/postprocess";
-import { tagGarment } from "@/lib/ai/tagging/claude";
+import { tagGarment } from "@/lib/ai/tagging";
 import type { AnalyzeGarmentResult } from "@/lib/types";
 
 /** El recorte y el etiquetado juntos pueden pasar de los diez segundos. */

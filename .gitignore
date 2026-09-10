@@ -10,3 +10,6 @@ next-env.d.ts
 .DS_Store
 npm-debug.log*
 coverage/
+
+# Fotos de prueba sueltas en el repo
+subir/
