@@ -18,23 +18,23 @@ describe("middleware", () => {
   });
 
   it("pide credenciales si faltan", () => {
-    process.env.APP_PASSWORD = "panconpalta";
+    process.env.APP_PASSWORD = "clave-de-prueba";
     const response = middleware(request());
     expect(response.status).toBe(401);
     expect(response.headers.get("WWW-Authenticate")).toContain("Basic");
   });
 
   it("rechaza usuario o contraseña incorrectos", () => {
-    process.env.APP_PASSWORD = "panconpalta";
+    process.env.APP_PASSWORD = "clave-de-prueba";
     expect(middleware(request("admin:otra")).status).toBe(401);
-    expect(middleware(request("otro:panconpalta")).status).toBe(401);
+    expect(middleware(request("otro:clave-de-prueba")).status).toBe(401);
     expect(middleware(request("admin:")).status).toBe(401);
-    expect(middleware(request("admin:panconpalta_")).status).toBe(401);
+    expect(middleware(request("admin:clave-de-prueba_")).status).toBe(401);
   });
 
   it("deja pasar con las credenciales correctas", () => {
-    process.env.APP_PASSWORD = "panconpalta";
-    expect(middleware(request("admin:panconpalta")).status).toBe(200);
+    process.env.APP_PASSWORD = "clave-de-prueba";
+    expect(middleware(request("admin:clave-de-prueba")).status).toBe(200);
   });
 
   it("admite dos puntos dentro de la contraseña", () => {

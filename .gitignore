@@ -13,3 +13,5 @@ coverage/
 
 # Fotos de prueba sueltas en el repo
 subir/
+
+.vercel
