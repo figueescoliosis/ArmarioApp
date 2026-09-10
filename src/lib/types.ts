@@ -214,15 +214,35 @@ export type ApiErrorCode =
   | "DATABASE_FAILED"
   | "INTERNAL";
 
-/** Resultado de subir una prenda: la prenda ya guardada más métricas del pipeline. */
-export interface CreateGarmentResult {
-  garment: Garment;
-  timings: {
-    backgroundRemovalMs: number;
-    taggingMs: number;
-    uploadMs: number;
-    totalMs: number;
-  };
+export interface PipelineTimings {
+  backgroundRemovalMs: number;
+  taggingMs: number;
+  uploadMs: number;
+  totalMs: number;
+}
+
+/**
+ * Resultado de analizar una foto: la prenda ya está recortada y subida al
+ * almacenamiento, pero **todavía no guardada en la base de datos**.
+ *
+ * La subida es en dos pasos a propósito. El usuario tiene que poder corregir lo
+ * que dedujo la IA antes de que la prenda entre en su armario, y para revisarlo
+ * necesita ver el recorte ya hecho. Guardar primero y corregir después dejaría
+ * prendas mal etiquetadas en el armario cada vez que alguien se arrepiente a
+ * mitad de camino.
+ */
+export interface AnalyzeGarmentResult {
+  imageUrl: string;
+  cutoutUrl: string;
+  thumbUrl: string | null;
+  /** Lo que dedujo el modelo. Es un borrador: el usuario puede cambiarlo todo. */
+  attributes: GarmentAttributes;
+  timings: PipelineTimings;
   /** Proveedor de recorte que atendió la petición: "fal", "photoroom"… */
   backgroundProvider: string;
+}
+
+/** Resultado de confirmar la prenda: la fila ya guardada. */
+export interface CreateGarmentResult {
+  garment: Garment;
 }

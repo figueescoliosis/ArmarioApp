@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/*
+ * Paleta "armario sereno": hueso cálido, tinta casi negra y un acento de
+ * arcilla/terracota. Nada de azules corporativos ni grises fríos de banca.
+ */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --color-bone: #faf6f0;
+  --color-bone-soft: #f1e9df;
+  --color-surface: #ffffff;
+  --color-ink: #24201c;
+  --color-ink-soft: #6b5f54;
+
+  --color-clay-50: #fbefe6;
+  --color-clay-100: #f4d9c4;
+  --color-clay-200: #e8b78f;
+  --color-clay-300: #db9a6c;
+  --color-clay-400: #c67d4c;
+  --color-clay-500: #b5643a;
+  --color-clay-600: #96502e;
+  --color-clay-700: #784025;
+
+  --color-neutral-50: #fafaf9;
+  --color-neutral-100: #f1efec;
+  --color-neutral-200: #e4e0da;
+  --color-neutral-300: #cfc9c0;
+  --color-neutral-400: #a8a099;
+  --color-neutral-500: #837b73;
+  --color-neutral-600: #665f58;
+  --color-neutral-700: #4a443f;
+  --color-neutral-800: #322e2a;
+  --color-neutral-900: #201d1a;
+}
+
+/* Modo oscuro por preferencia del sistema, salvo que la app fuerce "light". */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bone: #1b1815;
+    --color-bone-soft: #262220;
+    --color-surface: #232019;
+    --color-ink: #f3ece4;
+    --color-ink-soft: #c2b7ac;
+
+    --color-clay-50: #3a2a20;
+    --color-clay-100: #4d3527;
+    --color-clay-200: #7a4d33;
+    --color-clay-300: #a1633e;
+    --color-clay-400: #c47a4a;
+    --color-clay-500: #d98a5e;
+    --color-clay-600: #e6a679;
+    --color-clay-700: #f0c3a3;
+
+    --color-neutral-50: #242019;
+    --color-neutral-100: #2b271f;
+    --color-neutral-200: #3a352c;
+    --color-neutral-300: #4b453b;
+    --color-neutral-400: #6a6258;
+    --color-neutral-500: #8a8175;
+    --color-neutral-600: #aba192;
+    --color-neutral-700: #c9c0b3;
+    --color-neutral-800: #e3ddd2;
+    --color-neutral-900: #f5f1ea;
+  }
+}
+
+/* Selector explícito de tema oscuro (gana siempre, incluso con sistema en claro). */
+:root[data-theme="dark"] {
+  --color-bone: #1b1815;
+  --color-bone-soft: #262220;
+  --color-surface: #232019;
+  --color-ink: #f3ece4;
+  --color-ink-soft: #c2b7ac;
+
+  --color-clay-50: #3a2a20;
+  --color-clay-100: #4d3527;
+  --color-clay-200: #7a4d33;
+  --color-clay-300: #a1633e;
+  --color-clay-400: #c47a4a;
+  --color-clay-500: #d98a5e;
+  --color-clay-600: #e6a679;
+  --color-clay-700: #f0c3a3;
+
+  --color-neutral-50: #242019;
+  --color-neutral-100: #2b271f;
+  --color-neutral-200: #3a352c;
+  --color-neutral-300: #4b453b;
+  --color-neutral-400: #6a6258;
+  --color-neutral-500: #8a8175;
+  --color-neutral-600: #aba192;
+  --color-neutral-700: #c9c0b3;
+  --color-neutral-800: #e3ddd2;
+  --color-neutral-900: #f5f1ea;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--color-bone);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  /* Deja sitio a la barra de navegación inferior fija de la app. */
+  padding-bottom: 4.5rem;
+}
+
+/* Fondo a cuadros de transparencia, para previsualizar recortes sin fondo. */
+.checkerboard {
+  background-color: var(--color-neutral-50);
+  background-image: linear-gradient(45deg, var(--color-neutral-200) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-neutral-200) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-neutral-200) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-neutral-200) 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+}

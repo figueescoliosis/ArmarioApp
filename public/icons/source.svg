@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!--
+    Icono de la app: una percha estilizada, trazo grueso, terracota (#C4633F)
+    sobre fondo hueso (#FAF7F2). El dibujo se mantiene dentro del 80% central
+    (radio de seguridad de 51.2px en cada lado sobre un lienzo de 512) para
+    que funcione también como icono maskable sin recortes.
+  -->
+  <rect width="512" height="512" fill="#FAF7F2" />
+  <g fill="none" stroke="#C4633F" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Gancho: pequeño bucle que corona la percha. -->
+    <path d="M256 214 C256 198 244 190 232 180 C218 168 220 148 238 140 C254 133 270 143 270 158" />
+    <!-- Cuerpo: dos brazos que bajan desde el gancho hasta las puntas, con una ligera curva hacia arriba en cada extremo. -->
+    <path d="M96 372 C96 356 110 348 126 340 L246 224 C252 218 260 218 266 224 L386 340 C402 348 416 356 416 372" />
+    <!-- Barra inferior, ligeramente separada, típica de las perchas de pantalón. -->
+    <path d="M150 366 L362 366" />
+  </g>
+</svg>
