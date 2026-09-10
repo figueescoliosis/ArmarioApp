@@ -119,12 +119,12 @@ export default function OutfitsPage() {
           </div>
         </div>
 
-        <label className="flex min-h-11 items-center gap-3 text-sm">
+        <label className="flex min-h-11 items-start gap-3 py-1 text-sm">
           <input
             type="checkbox"
             checked={useLlm}
             onChange={(event) => setUseLlm(event.target.checked)}
-            className="h-5 w-5"
+            className="mt-0.5 h-5 w-5 shrink-0"
           />
           <span>
             Afinar con IA

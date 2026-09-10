@@ -179,6 +179,20 @@ describe("generateOutfits", () => {
     }
   });
 
+  it("veta el conjunto por su peor par, no por la media", () => {
+    // Con frío, el motor quiere añadir abrigo. Un plumas con sandalias puntúa
+    // 0,05, pero si se promediara con el resto de parejas se colaría igual.
+    for (const outfit of generateOutfits(seedWardrobe(), {
+      request: { temperatureC: 8, limit: 10 },
+      now: NOW,
+    })) {
+      const sub = outfit.items.map((item) => item.garment.subcategory);
+      expect(sub.some((s) => s.includes("sandalia")) && sub.some((s) => s.includes("plumas"))).toBe(
+        false,
+      );
+    }
+  });
+
   it("no propone chándal con zapato de vestir", () => {
     for (const outfit of generateOutfits(seedWardrobe(), { now: NOW })) {
       const sub = outfit.items.map((item) => item.garment.subcategory);

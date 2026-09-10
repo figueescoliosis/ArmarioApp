@@ -26,6 +26,7 @@ import {
   formalityScore,
   freshnessScore,
   hardRuleViolation,
+  minPairCompatibility,
   pairCompatibility,
   seasonScore,
   warmthForTemperature,
@@ -285,6 +286,10 @@ function addOptionalPieces(
       const trial = [...result.map((item) => item.garment), garment];
       if (hardRuleViolation(trial) !== null) continue;
 
+      // El veto va contra el peor par, no contra la media: si no, un abrigo
+      // imposible con el calzado ya elegido se cuela diluido entre pares buenos.
+      if (minPairCompatibility(trial) < PRUNE_FLOOR) continue;
+
       const compat = compatibilityScore(trial);
       if (compat < PRUNE_FLOOR) continue;
 
@@ -343,6 +348,7 @@ function scoreOutfit(
 ): Outfit | null {
   const garments = items.map((item) => item.garment);
   if (hardRuleViolation(garments) !== null) return null;
+  if (minPairCompatibility(garments) < PRUNE_FLOOR) return null;
 
   const breakdown = computeBreakdown(items, request, lastWorn, now);
 
@@ -398,7 +404,7 @@ function explainByRules(items: OutfitItem[], breakdown: ScoreBreakdown): string 
   if (registroLine !== undefined) parts.push(`El registro es ${registroLine}`);
 
   if (breakdown.freshness > 0.8) {
-    parts.push("además rescata prendas que llevabas tiempo sin ponerte");
+    parts.push("Además rescata prendas que llevabas tiempo sin ponerte");
   }
 
   return parts.length > 0 ? `${parts.join(". ")}.` : "Un conjunto equilibrado.";

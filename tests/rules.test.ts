@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  EXPLICIT_PAIR_KEYS,
+  GARMENT_KINDS,
   compatibilityScore,
   formalityScore,
   freshnessScore,
   garmentKind,
   hardRuleViolation,
+  minPairCompatibility,
   pairCompatibility,
   seasonScore,
   warmthForTemperature,
@@ -84,6 +87,52 @@ describe("compatibilityScore", () => {
   it("vale 1 con menos de dos prendas", () => {
     expect(compatibilityScore([])).toBe(1);
     expect(compatibilityScore([garment({ category: "top" })])).toBe(1);
+  });
+});
+
+describe("tabla de excepciones", () => {
+  it("solo nombra tipos de prenda que existen", () => {
+    // Una clave con un tipo mal escrito no da error de compilación en tiempo de
+    // ejecución: simplemente nunca se consulta y la excepción se pierde en
+    // silencio. Ya pasó una vez con seis claves.
+    const conocidos = new Set<string>(GARMENT_KINDS);
+    for (const key of EXPLICIT_PAIR_KEYS) {
+      const [a, b] = key.split("|");
+      expect(conocidos.has(a ?? ""), `${key}: "${a}" no es un tipo de prenda`).toBe(true);
+      expect(conocidos.has(b ?? ""), `${key}: "${b}" no es un tipo de prenda`).toBe(true);
+    }
+  });
+
+  it("aplica cada excepción sin importar el orden de las prendas", () => {
+    // La tabla se escribe como se lee ("sandalia|plumas"), no en orden
+    // alfabético, así que la reindexación tiene que hacer su trabajo.
+    const sandalia = garment({ category: "shoes", subcategory: "sandalia de cuero", formality: 2 });
+    const plumas = garment({ category: "outerwear", subcategory: "plumífero", formality: 2 });
+    expect(pairCompatibility(sandalia, plumas)).toBeLessThan(0.1);
+    expect(pairCompatibility(plumas, sandalia)).toBeLessThan(0.1);
+
+    const chandal = garment({ category: "bottom", subcategory: "chándal", formality: 2 });
+    const blazer = garment({ category: "outerwear", subcategory: "blazer", formality: 2 });
+    expect(pairCompatibility(chandal, blazer)).toBeLessThan(0.2);
+  });
+});
+
+describe("minPairCompatibility", () => {
+  it("devuelve el peor par, no la media", () => {
+    const conjunto = [
+      garment({ category: "top", subcategory: "camiseta", formality: 2 }),
+      garment({ category: "bottom", subcategory: "vaquero", formality: 2 }),
+      garment({ category: "shoes", subcategory: "sandalia de cuero", formality: 2 }),
+      garment({ category: "outerwear", subcategory: "plumífero", formality: 2 }),
+    ];
+    // Tres parejas son perfectas y una es imposible: la media lo taparía.
+    expect(compatibilityScore(conjunto)).toBeGreaterThan(0.7);
+    expect(minPairCompatibility(conjunto)).toBeLessThan(0.1);
+  });
+
+  it("vale 1 con menos de dos prendas", () => {
+    expect(minPairCompatibility([])).toBe(1);
+    expect(minPairCompatibility([garment({ category: "top" })])).toBe(1);
   });
 });
 

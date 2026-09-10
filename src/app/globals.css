@@ -122,3 +122,19 @@ body {
     8px -8px,
     -8px 0;
 }
+
+/*
+ * Los controles nativos (deslizadores, casillas, selectores de color) se pintan
+ * en el azul del sistema si no se les dice otra cosa, y ese azul rompe la
+ * paleta en la única pantalla donde aparecen varios juntos.
+ */
+input[type="range"],
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-clay-500);
+}
+
+input[type="range"] {
+  /* Objetivo táctil cómodo: se usa con el pulgar, de pie. */
+  min-height: 2.75rem;
+}
