@@ -307,7 +307,9 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
         </div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 flex gap-3 border-t border-neutral-200 bg-surface p-4">
+      {/* Por encima del menú (z-40), no debajo: mientras se revisan las etiquetas
+          estos dos botones son la única salida del paso, y el menú los tapaba. */}
+      <div className="fixed inset-x-0 bottom-0 z-50 flex gap-3 border-t border-neutral-200 bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <Button variant="secondary" size="lg" className="flex-1" onClick={onCancel} disabled={saving}>
           Cancelar
         </Button>

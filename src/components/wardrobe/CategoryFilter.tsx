@@ -21,12 +21,11 @@ export interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ value, counts, onChange }: CategoryFilterProps) {
+  // Los chips se envuelven en vez de scrollar en horizontal: en un móvil de
+  // 375px el scroll dejaba "Vestidos" cortado a media palabra, sin ninguna
+  // pista de que hubiera más categorías a la derecha.
   return (
-    <div
-      role="group"
-      aria-label="Filtrar por categoría"
-      className="flex gap-2 overflow-x-auto pb-1"
-    >
+    <div role="group" aria-label="Filtrar por categoría" className="flex flex-wrap gap-2">
       {OPTIONS.map((option) => (
         <Chip
           key={option}
