@@ -1,8 +1,24 @@
 # Handoff
 
-Estado del proyecto en el punto en que se entrega: código completo, tipado en
-verde, tests en verde. Sin claves de API dadas de alta todavía, así que la
-parte que depende de servicios externos no se ha probado con datos reales.
+Estado del proyecto: desplegado y funcionando de punta a punta con datos
+reales. Tipos, lint y 109 tests en verde.
+
+## Estado de los servicios
+
+| Pieza | Servicio | Estado |
+|---|---|---|
+| Base de datos y Storage | Supabase, plan Free, West EU (Ireland) | Migración aplicada, 4 tablas con RLS, bucket público `garments` |
+| Recorte de fondo | remove.bg | Funcionando. 50 imágenes al mes gratis, a 0,25 MP |
+| Etiquetado y redacción | Google Gemini (AI Studio) | Funcionando. Cuota diaria gratuita, sin tarjeta |
+| Hosting | Vercel, plan Hobby | Desplegado, con Basic Auth delante |
+
+La combinación elegida no cuesta nada. Ni fal.ai ni Anthropic tienen plan
+gratuito, y por eso se añadieron `removebg` y `gemini` como proveedores: el
+apartado D de `docs/SETUP-APIS.md` lo explica con sus límites reales.
+
+Cambiar a los proveedores de pago es cambiar dos variables de entorno
+(`BG_REMOVAL_PROVIDER=fal`, `TAGGING_PROVIDER=anthropic`) y añadir sus claves.
+No hay que tocar código.
 
 ## Arrancar en local
 
@@ -14,76 +30,72 @@ npm install
 cp .env.example .env.local
 ```
 
-Rellenar `.env.local` con las claves (ver siguiente sección) y luego:
+Rellenar `.env.local` siguiendo `docs/SETUP-APIS.md` y luego:
 
 ```bash
 npm run dev
 ```
 
-La app queda en http://localhost:3000.
+`APP_PASSWORD` puede quedarse vacía en local: sin ella el middleware no pide
+credenciales.
 
-## Dar de alta las API keys con Claude Code
+## Qué está verificado
 
-Instalar Claude Code si no está ya:
+Probado contra los servicios reales, no solo compilado:
 
-```bash
-npm i -g @anthropic-ai/claude-code
-claude
-```
+- **Pipeline completo de subida**, cinco prendas reales: recorte, normalizado,
+  etiquetado y guardado. El recorte de remove.bg sale limpio (comprobado a
+  tamaño completo, 1024² con fondo transparente y bordes correctos hasta en
+  los cordones de una zapatilla). El etiquetado de Gemini acierta categoría,
+  subcategoría, colores, material, formalidad y temporadas.
+- **Generación de conjuntos** sobre esas cinco prendas, y la casilla *Afinar
+  con IA*, que devuelve nombres y explicaciones concretas — incluida una
+  crítica honesta del conjunto más flojo.
+- **Basic Auth en producción**: sin credenciales y con credenciales
+  incorrectas devuelve 401 tanto la web como `/api/*`.
+- **Tiempos en producción**: el análisis completo tarda unos 7,5 s (recorte
+  1,2 s + modelo 5,1 s + subida 0,9 s), muy por debajo del límite de 60 s de
+  las funciones de Vercel. En local va entre 9 y 14 s.
 
-Dentro de la sesión, pedirle:
+Sin verificar:
 
-> lee docs/SETUP-APIS.md y ayúdame a dar de alta las API keys
+- Los proveedores de pago (fal.ai, Photoroom, Anthropic): el código está
+  escrito y tipado, pero nunca se ha ejecutado con una clave activa.
+- El comportamiento offline del service worker con tráfico real.
+- El generador con un armario grande. Está acotado por diseño
+  (`MAX_CANDIDATES_PER_SLOT`, `ENRICH_TOP_N` en `generator.ts`) pero solo se ha
+  probado con cinco prendas.
 
-Ese documento está escrito para que Claude Code, con control del navegador,
-cree las cuentas de Supabase, fal.ai y Anthropic paso a paso y deje
-`.env.local` relleno.
+## Deuda conocida
 
-## Qué está verificado y qué no
-
-Verificado en esta entrega:
-
-- Compilación (`npm run build`) y tipos (`npm run typecheck`) en verde.
-- El motor de conjuntos (`src/lib/outfits/generator.ts` y el resto de
-  `src/lib/outfits/`) tiene 80 tests pasando (`npm run test`), incluida la
-  puntuación por color, las reglas de compatibilidad y el generador
-  combinatorio. Es determinista y no depende de ninguna API, así que es la
-  parte del proyecto en la que más se puede confiar sin haberla probado a
-  mano.
-
-Todavía sin verificar, porque se construyó sin claves activas:
-
-- La subida real de imágenes a Supabase Storage (el código está escrito y
-  compila, pero no se ha ejecutado contra un proyecto Supabase real).
-- La calidad del recorte de fondo de fal.ai sobre una foto real de una
-  prenda (bordes en tejidos de punto, encaje, transparencias — es justo lo
-  que el proveedor promete hacer mejor, pero no se ha comprobado).
-- La precisión del etiquetado de Claude Vision: si acierta categoría,
-  colores, material y estilo sobre fotos reales del armario del usuario.
-
-La prueba de humo descrita al final de `docs/SETUP-APIS.md` (subir dos
-prendas y generar conjuntos) es la forma más rápida de comprobar estos tres
-puntos de una vez.
+- **`panconpalta` quedó en el commit `14b77a4`**, cuando el repo aún era
+  privado, por usar la contraseña real como fixture del test del middleware.
+  El repo es público desde entonces, así que esa contraseña está quemada y ya
+  se rotó. Los tests usan un valor ficticio.
+- **El repo tiene que seguir siendo público** para que Vercel construya: en
+  plan Hobby con repo privado bloquea el build porque el autor de los commits
+  no coincide con el dueño del proyecto de Vercel.
+- **El modelo de Gemini está fijado** a `gemini-3.5-flash` en vez del alias
+  `gemini-flash-latest`, que a día de hoy responde 503 por saturación. Hay un
+  comentario `ponytail:` en `src/lib/ai/gemini.ts` con el camino de vuelta.
 
 ## Siguientes pasos naturales
 
 - **Registrar qué se lleva puesto cada día.** El esquema ya tiene la tabla
-  `wear_log` y el endpoint `POST /api/garments/[id]/wear`
-  (`src/app/api/garments/[id]/wear/route.ts`); falta solo la pantalla o el
-  botón en la UI que lo dispare desde `/armario` u `/outfits`.
-- **Login con Supabase Auth.** Todas las tablas ya llevan `owner_id` con
-  valor por defecto `'default'` (ver `supabase/migrations/0001_init.sql` y
-  `DEFAULT_OWNER_ID` en `src/lib/db/supabase.ts`), pensado explícitamente
-  para que pasar a multiusuario sea sustituir ese valor fijo por el usuario
-  autenticado, sin tocar el esquema.
-- **Desplegar en Vercel**, que es el hosting más directo para una app
-  Next.js. Solo hace falta configurar las mismas variables de entorno de
-  `.env.local` en el panel del proyecto.
-- **Ajustar la matriz de reglas de compatibilidad** (`src/lib/outfits/rules.ts`)
-  con los gustos reales del usuario una vez pruebe el generador con su
-  armario, en vez de dejarla como quedó a partir de supuestos genéricos de
-  estilismo.
-- **Añadir un service worker más completo.** Ya existe `public/sw.js` y el
-  manifest de PWA, pero conviene revisar la estrategia de caché una vez la
-  app tenga tráfico real, para que funcione bien offline con el armario ya
-  cargado.
+  `wear_log` y el endpoint `POST /api/garments/[id]/wear`; falta el botón en
+  la UI que lo dispare desde `/armario` u `/outfits`. El generador ya usa esa
+  información (`freshnessScore`), así que hoy ese factor está siempre a cero.
+- **Login con Supabase Auth.** Todas las tablas llevan `owner_id` con valor
+  por defecto `'default'`, pensado para que pasar a multiusuario sea sustituir
+  `DEFAULT_OWNER_ID` por el usuario autenticado sin tocar el esquema. Haría
+  falta escribir políticas RLS, que hoy no existen. Eso permitiría además
+  quitar el Basic Auth del middleware.
+- **Ajustar la matriz de compatibilidad** (`src/lib/outfits/rules.ts`) con los
+  gustos reales del usuario, en vez de dejarla como quedó a partir de
+  supuestos genéricos de estilismo.
+- **Vigilar la cuota de remove.bg.** Son 50 imágenes al mes y no avisa: al
+  agotarse, la subida falla con `BACKGROUND_REMOVAL_FAILED`. Si se queda
+  corta, la alternativa gratis es recortar en local con un modelo ONNX; la de
+  pago, volver a `BG_REMOVAL_PROVIDER=fal`.
+- **Revisar la estrategia de caché del service worker** (`public/sw.js`) para
+  que la app funcione offline con el armario ya cargado.

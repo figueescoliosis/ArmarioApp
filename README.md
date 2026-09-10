@@ -8,8 +8,8 @@ implícito.
 ## Arrancar
 
 Requisitos: Node 20 o superior, y las claves de Supabase, un proveedor de
-recorte de fondo y Anthropic (ver `docs/SETUP-APIS.md` para darlas de alta
-paso a paso).
+recorte de fondo y un proveedor de etiquetado (ver `docs/SETUP-APIS.md` para
+darlas de alta paso a paso; el apartado D explica la combinación sin coste).
 
 ```bash
 npm install
@@ -42,7 +42,7 @@ Generar conjuntos:
 ```
 armario ──▶ motor de reglas (determinista, sin red) ──▶ conjuntos puntuados
                                     │
-                                    └─▶ opcional: Claude reordena
+                                    └─▶ opcional: un modelo reordena
                                         y redacta el top 5
 ```
 
@@ -78,8 +78,8 @@ armario ──▶ motor de reglas (determinista, sin red) ──▶ conjuntos pu
   hay que llenar y qué combinaciones son imposibles; `color.ts` es la teoría
   del color (RGB/HSL/CIELAB) que mide armonía entre prendas; `generator.ts`
   hace la búsqueda combinatoria con poda; `signature.ts` calcula el hash
-  estable de un conjunto; `explain.ts` es el paso opcional que deja a Claude
-  reordenar y redactar el top 5.
+  estable de un conjunto; `explain.ts` es el paso opcional que deja a un
+  modelo reordenar y redactar el top 5.
 - **`lib/types.ts`** — el contrato de tipos de toda la app: todo lo que cruza
   una frontera (cliente↔API, API↔base de datos) se define aquí una sola vez.
 - **`lib/errors.ts`**, **`lib/api.ts`** — manejo de errores uniforme:
@@ -89,6 +89,9 @@ armario ──▶ motor de reglas (determinista, sin red) ──▶ conjuntos pu
 - **`lib/client-api.ts`** — el único sitio del cliente que hace `fetch` a
   `/api/*`; las páginas llaman a estas funciones, no a `fetch` directamente.
 - **`lib/pwa.ts`** — registro del service worker, solo en producción.
+- **`middleware.ts`** — Basic Auth delante de toda la app cuando
+  `APP_PASSWORD` está puesta. La app no tiene login, así que es lo único que
+  separa un despliegue público de un armario abierto a cualquiera.
 
 ## Arquitectura
 
@@ -107,6 +110,7 @@ suelto:
    casos sin mocks. El modelo de lenguaje (`lib/outfits/explain.ts`) es un
    paso opcional encima: solo reordena y redacta el top 5, y si falla o no
    hay clave, la app sigue devolviendo los conjuntos de las reglas tal cual.
+   Usa Claude si hay `ANTHROPIC_API_KEY` y Gemini si no.
 3. **La subida es en dos pasos.** `POST /api/garments/analyze` recorta,
    normaliza y etiqueta, pero no escribe en la base de datos: devuelve un
    borrador. `POST /api/garments` guarda la fila definitiva. Entre medias el
@@ -138,5 +142,9 @@ Ver `docs/SETUP-APIS.md` para el paso a paso de cómo obtener cada valor.
 | `FAL_KEY` | Sí, si el proveedor es `fal` | Clave de fal.ai |
 | `PHOTOROOM_API_KEY` | Sí, si el proveedor es `photoroom` | Clave de Photoroom |
 | `REMOVE_BG_API_KEY` | Sí, si el proveedor es `removebg` | Clave de remove.bg |
-| `ANTHROPIC_API_KEY` | Sí | Clave de Anthropic, para etiquetar prendas y redactar conjuntos |
+| `TAGGING_PROVIDER` | No (por defecto `anthropic`) | Elige el proveedor de etiquetado: `anthropic` o `gemini` |
+| `ANTHROPIC_API_KEY` | Sí, si el proveedor es `anthropic` | Clave de Anthropic, para etiquetar prendas y redactar conjuntos |
 | `ANTHROPIC_MODEL` | No (por defecto `claude-opus-5`) | Cambia el modelo de Claude usado |
+| `GEMINI_API_KEY` | Sí, si el proveedor es `gemini` | Clave de Google AI Studio. Es la única con cuota gratuita sin tarjeta |
+| `GEMINI_MODEL` | No (por defecto `gemini-3.5-flash`) | Cambia el modelo de Gemini usado |
+| `APP_PASSWORD` | Solo en despliegue | Contraseña de acceso (usuario `admin`). Vacía en local no pide nada |
