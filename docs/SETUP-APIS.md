@@ -162,6 +162,25 @@ en el apartado C.
 
 ---
 
+## E. Contraseña de acceso (obligatorio si se despliega)
+
+La app no tiene login: todas las prendas viven bajo un único dueño
+(`DEFAULT_OWNER_ID` en `src/lib/db/supabase.ts`). En una URL pública eso
+significa que cualquiera que la encuentre ve el armario, borra prendas y gasta
+la cuota de los servicios de pago.
+
+`src/middleware.ts` pone un Basic Auth delante de todo. Poner en `.env.local`
+(y en las variables del despliegue):
+
+```
+APP_PASSWORD=la-que-sea
+```
+
+El usuario es siempre `admin`. Si la variable está vacía el middleware no pide
+nada, que es lo cómodo en local; en el despliegue es obligatoria.
+
+---
+
 ## Comprobar que todo funciona
 
 Con las tres claves puestas en `.env.local`:
