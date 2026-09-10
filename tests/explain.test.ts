@@ -57,9 +57,9 @@ describe("explainOutfits", () => {
       ],
     });
 
-    const [result] = await explainOutfits([outfit("a")]);
-    expect(result.name).toBe("Negro sobre negro");
-    expect(result.source).toBe("rules+llm");
+    const result = await explainOutfits([outfit("a")]);
+    expect(result[0]?.name).toBe("Negro sobre negro");
+    expect(result[0]?.source).toBe("rules+llm");
   });
 
   it("degrada a los conjuntos de reglas si el modelo falla", async () => {
