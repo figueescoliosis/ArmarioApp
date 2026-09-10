@@ -164,6 +164,27 @@ export interface Outfit {
   createdAt: string;
 }
 
+/** Un desajuste detectado en un conjunto compuesto a mano. */
+export interface LookIssue {
+  /** `grave` es lo que el generador vetaría; `leve` solo se avisa. */
+  severity: "grave" | "leve";
+  /** Redactado en español y mostrable tal cual. */
+  message: string;
+}
+
+/**
+ * Veredicto sobre un conjunto que ha montado el usuario en el probador.
+ *
+ * Se calcula en el navegador con las mismas funciones puras que usa el motor,
+ * así que la alerta aparece al instante y sin gastar cuota de ningún servicio.
+ */
+export interface LookEvaluation {
+  score: number;
+  breakdown: ScoreBreakdown;
+  rationale: string;
+  issues: LookIssue[];
+}
+
 /** Restricciones opcionales que el usuario impone al generar conjuntos. */
 export interface OutfitRequest {
   /** Nivel de formalidad objetivo. Sin él, se aceptan todos. */

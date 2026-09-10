@@ -48,8 +48,11 @@ async function unwrap<T>(response: Response): Promise<T> {
 
 /* ────────────────────────────── Prendas ────────────────────────────── */
 
-export async function fetchGarments(): Promise<Garment[]> {
-  return unwrap<Garment[]>(await fetch("/api/garments", { cache: "no-store" }));
+export async function fetchGarments(opts?: { archived?: boolean }): Promise<Garment[]> {
+  // Con `archived=true` la API devuelve archivadas **y** activas mezcladas:
+  // quien quiera solo la papelera filtra por `garment.archived`.
+  const query = opts?.archived === true ? "?archived=true" : "";
+  return unwrap<Garment[]>(await fetch(`/api/garments${query}`, { cache: "no-store" }));
 }
 
 /** Paso 1: recorta, etiqueta y sube. No guarda todavía. */
@@ -92,6 +95,11 @@ export async function deleteGarment(id: string): Promise<void> {
   await unwrap<{ id: string }>(await fetch(`/api/garments/${id}`, { method: "DELETE" }));
 }
 
+/** garmentId → fecha ISO de la última vez que se registró su uso. */
+export async function fetchWearLog(): Promise<Record<string, string>> {
+  return unwrap<Record<string, string>>(await fetch("/api/wear", { cache: "no-store" }));
+}
+
 export async function logWear(garmentId: string): Promise<void> {
   await unwrap(await fetch(`/api/garments/${garmentId}/wear`, { method: "POST" }));
 }
@@ -104,6 +112,17 @@ export async function generateOutfits(request: OutfitRequest = {}): Promise<Outf
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
+    }),
+  );
+}
+
+/** Pide al modelo que opine sobre un look montado a mano en el probador. */
+export async function critiqueLook(garmentIds: string[]): Promise<Outfit> {
+  return unwrap<Outfit>(
+    await fetch("/api/outfits/critique", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ garmentIds }),
     }),
   );
 }

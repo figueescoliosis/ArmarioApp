@@ -49,7 +49,13 @@ Romper cualquiera de estos es un bug aunque los tests pasen.
 6. **Toda respuesta de `/api/*` tiene la forma `ApiResponse<T>`.** Se
    construye con `ok()` / `fail()` / `handle()` de `src/lib/api.ts`; el cliente
    solo mira `ok`. No devolver `NextResponse.json` a mano.
-7. **Falta de configuración = `MissingConfigError`.** Lleva el nombre exacto
+7. **`src/lib/outfits/score.ts` no puede importar `generator.ts` ni
+   `signature.ts`.** El probador puntúa en el navegador y esos dos módulos
+   arrastran `node:crypto`, que rompe el build del cliente. Por eso la
+   puntuación vive en `score.ts` y el generador la importa de ahí, y no al
+   revés. Es también lo que garantiza que el mismo conjunto no muestre un
+   porcentaje en `/probador` y otro en `/outfits`.
+8. **Falta de configuración = `MissingConfigError`.** Lleva el nombre exacto
    de la variable ausente hasta la interfaz (`missingEnvVar`). Nunca degradar
    en silencio por una clave que falta, salvo en `explain.ts`, donde es
    deliberado.
@@ -61,7 +67,8 @@ Romper cualquiera de estos es un bug aunque los tests pasen.
 | Añadir un proveedor de recorte | `src/lib/ai/background/`, registrarlo en el mapa `PROVIDERS` de su `index.ts` |
 | Añadir un proveedor de etiquetado | `src/lib/ai/tagging/`, registrarlo en `PROVIDERS` de `tagging/index.ts` |
 | Cambiar qué combina con qué | `src/lib/outfits/rules.ts` (plantillas, tipos de prenda, incompatibilidades) |
-| Cambiar cuánto pesa el color frente al resto | `WEIGHTS` en `src/lib/outfits/generator.ts` |
+| Cambiar cuánto pesa el color frente al resto | `WEIGHTS` en `src/lib/outfits/score.ts` |
+| Cambiar qué se avisa como «Mis-match» | `collectIssues()` en `src/lib/outfits/score.ts` |
 | Añadir un campo a la prenda | `src/lib/types.ts` → `supabase/migrations/` → `src/lib/db/schema.ts` (los tres, en ese orden) |
 | Cambiar el tamaño del recorte o la miniatura | constantes al principio de `src/lib/ai/postprocess.ts` |
 | Proteger o abrir rutas | `src/middleware.ts` (`config.matcher`) |
@@ -127,7 +134,7 @@ Vitest, sin framework de mocks más allá de `vi.spyOn(globalThis, "fetch")`.
 `tests/fixtures.ts` construye prendas y armarios de prueba con ids estables
 (`resetIds()` entre tests).
 
-- `color`, `rules`, `generator`, `schema`, `image` — lógica pura, sin red.
+- `color`, `rules`, `generator`, `evaluate`, `schema`, `image` — lógica pura, sin red.
 - `tagging`, `explain` — el `fetch` a Gemini interceptado.
 - `middleware` — la puerta de Basic Auth.
 

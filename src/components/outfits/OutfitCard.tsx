@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import type { Outfit, OutfitItem, ScoreBreakdown, Slot } from "@/lib/types";
+import type { Outfit, ScoreBreakdown } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
+import { MannequinGrid } from "./MannequinGrid";
+import { ScoreRing } from "./ScoreRing";
 
 export interface OutfitCardProps {
   outfit: Outfit;
@@ -29,56 +30,15 @@ const BREAKDOWN_KEYS: Array<keyof ScoreBreakdown> = [
 
 export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const bySlot = new Map<Slot, OutfitItem>();
-  for (const item of outfit.items) bySlot.set(item.slot, item);
-
-  const hasDress = bySlot.has("dress");
   const percent = Math.round(outfit.score * 100);
 
   return (
     <article className="flex flex-col gap-4 rounded-3xl border border-neutral-200 bg-surface p-4 shadow-sm">
       <div className="flex items-start gap-4">
-        <div
-          className="grid flex-1 gap-2"
-          style={{
-            gridTemplateAreas: hasDress
-              ? `"dress dress" "dress dress" "shoes accessory"`
-              : `"outerwear top" "bottom bottom" "shoes accessory"`,
-            gridTemplateColumns: "1fr 1fr",
-            gridTemplateRows: "1fr 1fr 1fr",
-            height: "16rem",
-          }}
-        >
-          {hasDress ? (
-            <>
-              <SlotCell slot="dress" item={bySlot.get("dress")} />
-              <SlotCell slot="shoes" item={bySlot.get("shoes")} />
-              <SlotCell slot="accessory" item={bySlot.get("accessory")} />
-            </>
-          ) : (
-            <>
-              <SlotCell slot="outerwear" item={bySlot.get("outerwear")} />
-              <SlotCell slot="top" item={bySlot.get("top")} />
-              <SlotCell slot="bottom" item={bySlot.get("bottom")} />
-              <SlotCell slot="shoes" item={bySlot.get("shoes")} />
-              <SlotCell slot="accessory" item={bySlot.get("accessory")} />
-            </>
-          )}
-        </div>
+        <MannequinGrid items={outfit.items} />
 
         <div className="flex flex-col items-center gap-1">
-          <div
-            className="relative flex h-16 w-16 items-center justify-center rounded-full"
-            style={{
-              background: `conic-gradient(var(--color-clay-500) ${percent * 3.6}deg, var(--color-neutral-200) 0deg)`,
-            }}
-            role="img"
-            aria-label={`Puntuación del conjunto: ${percent}%`}
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface text-sm font-semibold text-ink">
-              {percent}%
-            </div>
-          </div>
+          <ScoreRing percent={percent} />
           <button
             type="button"
             aria-pressed={outfit.isFavorite}
@@ -129,29 +89,6 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps
         Me lo pongo hoy
       </Button>
     </article>
-  );
-}
-
-function SlotCell({ slot, item }: { slot: Slot; item?: OutfitItem }) {
-  return (
-    <div
-      style={{ gridArea: slot }}
-      className="relative flex items-center justify-center overflow-hidden rounded-xl border border-dashed border-neutral-200 bg-bone-soft"
-    >
-      {item ? (
-        <Image
-          src={item.garment.thumbUrl ?? item.garment.cutoutUrl}
-          alt={item.garment.subcategory || "Prenda"}
-          fill
-          sizes="140px"
-          className="object-contain p-1.5"
-        />
-      ) : (
-        <span className="text-xs text-ink-soft" aria-hidden="true">
-          —
-        </span>
-      )}
-    </div>
   );
 }
 

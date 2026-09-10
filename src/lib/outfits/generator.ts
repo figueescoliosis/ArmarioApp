@@ -16,37 +16,32 @@ import type {
   Outfit,
   OutfitItem,
   OutfitRequest,
-  ScoreBreakdown,
   Slot,
 } from "@/lib/types";
-import { harmonyScore, paletteHarmony } from "@/lib/outfits/color";
+import { paletteHarmony } from "@/lib/outfits/color";
 import {
   OUTFIT_TEMPLATES,
   compatibilityScore,
-  formalityScore,
   freshnessScore,
   hardRuleViolation,
   minPairCompatibility,
   pairCompatibility,
-  seasonScore,
   warmthForTemperature,
 } from "@/lib/outfits/rules";
+import {
+  PRUNE_FLOOR,
+  computeBreakdown,
+  explainByRules,
+  weighted,
+} from "@/lib/outfits/score";
 import { computeSignature } from "@/lib/outfits/signature";
 
-/** Peso de cada componente en la puntuación final. Suman 1. */
-export const WEIGHTS: Readonly<ScoreBreakdown> = {
-  color: 0.35,
-  compatibility: 0.25,
-  formality: 0.2,
-  season: 0.1,
-  freshness: 0.1,
-};
-
 /**
- * Por debajo de esta compatibilidad entre dos prendas, la rama se abandona.
- * Es el corte que evita la explosión combinatoria en armarios grandes.
+ * La puntuación vive en `score.ts` porque el probador la necesita en el
+ * navegador y este módulo arrastra `node:crypto`. Se reexporta para no romper
+ * a quien ya la importaba de aquí.
  */
-const PRUNE_FLOOR = 0.3;
+export { WEIGHTS } from "@/lib/outfits/score";
 
 /** Máximo de candidatas por hueco. Acota el peor caso a unas decenas de miles. */
 const MAX_CANDIDATES_PER_SLOT = 25;
@@ -309,36 +304,6 @@ function addOptionalPieces(
 
 /* ────────────────────────── Puntuación ────────────────────────── */
 
-function computeBreakdown(
-  items: OutfitItem[],
-  request: OutfitRequest,
-  lastWorn: Map<string, string>,
-  now: Date,
-): ScoreBreakdown {
-  const garments = items.map((item) => item.garment);
-
-  return {
-    color: paletteHarmony(garments.map((g) => g.primaryHex)),
-    compatibility: compatibilityScore(garments),
-    formality: formalityScore(garments, request.occasion),
-    season: seasonScore(garments, {
-      season: request.season,
-      temperatureC: request.temperatureC,
-    }),
-    freshness: freshnessScore(garments, lastWorn, now),
-  };
-}
-
-function weighted(breakdown: ScoreBreakdown): number {
-  return (
-    breakdown.color * WEIGHTS.color +
-    breakdown.compatibility * WEIGHTS.compatibility +
-    breakdown.formality * WEIGHTS.formality +
-    breakdown.season * WEIGHTS.season +
-    breakdown.freshness * WEIGHTS.freshness
-  );
-}
-
 /** Ensambla el conjunto definitivo. Solo se llama para los finalistas. */
 function scoreOutfit(
   items: OutfitItem[],
@@ -363,51 +328,6 @@ function scoreOutfit(
     isFavorite: false,
     createdAt: now.toISOString(),
   };
-}
-
-/**
- * Explicación de estilista, sin modelo de lenguaje. Se queda con el rasgo más
- * característico del conjunto en vez de recitar las cinco métricas.
- */
-function explainByRules(items: OutfitItem[], breakdown: ScoreBreakdown): string {
-  const garments = items.map((item) => item.garment);
-  const first = garments[0];
-  const second = garments[1];
-
-  const parts: string[] = [];
-
-  if (first !== undefined && second !== undefined) {
-    const harmony = harmonyScore(first.primaryHex, second.primaryHex);
-    const byKind: Record<string, string> = {
-      neutral: "Se apoya en una base neutra, que es lo que hace que no falle",
-      monocromatico: "Juega con un mismo color en dos intensidades",
-      analogo: "Combina colores vecinos, así que el salto entre prendas es suave",
-      triadico: "Reparte el color en tres puntos equidistantes de la rueda",
-      complementario: "Enfrenta dos colores opuestos y por eso tiene fuerza",
-      discordante: "Mezcla colores que no son parientes, con lo que arriesga",
-    };
-    const line = byKind[harmony.kind];
-    if (line !== undefined) parts.push(line);
-  }
-
-  const formality = Math.round(
-    garments.reduce((sum, g) => sum + g.formality, 0) / Math.max(1, garments.length),
-  );
-  const registro: Record<number, string> = {
-    1: "para estar por casa",
-    2: "de diario",
-    3: "resuelto pero informal",
-    4: "para una ocasión formal",
-    5: "de etiqueta",
-  };
-  const registroLine = registro[formality];
-  if (registroLine !== undefined) parts.push(`El registro es ${registroLine}`);
-
-  if (breakdown.freshness > 0.8) {
-    parts.push("Además rescata prendas que llevabas tiempo sin ponerte");
-  }
-
-  return parts.length > 0 ? `${parts.join(". ")}.` : "Un conjunto equilibrado.";
 }
 
 /* ────────────────────────── Diversidad ────────────────────────── */

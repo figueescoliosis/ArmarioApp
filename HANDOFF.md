@@ -81,10 +81,9 @@ Sin verificar:
 
 ## Siguientes pasos naturales
 
-- **Registrar qué se lleva puesto cada día.** El esquema ya tiene la tabla
-  `wear_log` y el endpoint `POST /api/garments/[id]/wear`; falta el botón en
-  la UI que lo dispare desde `/armario` u `/outfits`. El generador ya usa esa
-  información (`freshnessScore`), así que hoy ese factor está siempre a cero.
+- **Registrar el uso desde `/armario`.** El botón «Me lo pongo hoy» ya existe
+  en `/outfits`, `/favoritos` y `/probador`, así que `freshnessScore` ya recibe
+  datos; falta poder anotar una prenda suelta desde la rejilla del armario.
 - **Login con Supabase Auth.** Todas las tablas llevan `owner_id` con valor
   por defecto `'default'`, pensado para que pasar a multiusuario sea sustituir
   `DEFAULT_OWNER_ID` por el usuario autenticado sin tocar el esquema. Haría
