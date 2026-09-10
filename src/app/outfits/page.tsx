@@ -12,6 +12,7 @@ import { useState } from "react";
 
 import { OutfitDeck } from "@/components/outfits/OutfitDeck";
 import { Button } from "@/components/ui/Button";
+import { Cabecera } from "@/components/ui/Cabecera";
 import { Chip } from "@/components/ui/Chip";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ApiCallError, generateOutfits, logWear, saveFavorite } from "@/lib/client-api";
@@ -73,16 +74,11 @@ export default function OutfitsPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Conjuntos</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Combinaciones hechas con lo que ya tienes.
-        </p>
-      </header>
+      <Cabecera titulo="Conjuntos" subtitulo="Combinaciones hechas con lo que ya tienes." />
 
-      <section className="space-y-4 rounded-2xl border border-line bg-bone-soft p-4">
+      <section className="space-y-4 rounded-[28px] bg-surface p-4 shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
         <fieldset>
-          <legend className="mb-2 text-sm font-medium">¿Para qué ocasión?</legend>
+          <legend className="mb-2 text-sm font-bold text-ink">¿Para qué ocasión?</legend>
           <div className="flex flex-wrap gap-2">
             <Chip label="Cualquiera" selected={occasion === null} onClick={() => setOccasion(null)} />
             {OCCASIONS.map((level) => (
@@ -97,7 +93,7 @@ export default function OutfitsPage() {
         </fieldset>
 
         <div>
-          <label htmlFor="temp" className="mb-2 block text-sm font-medium">
+          <label htmlFor="temp" className="mb-2 block text-sm font-bold text-ink">
             Temperatura: {temperature === null ? "sin especificar" : `${temperature}°`}
           </label>
           <div className="flex items-center gap-3">
@@ -126,9 +122,9 @@ export default function OutfitsPage() {
             onChange={(event) => setUseLlm(event.target.checked)}
             className="mt-0.5 h-5 w-5 shrink-0"
           />
-          <span>
+          <span className="font-bold text-ink">
             Afinar con IA
-            <span className="block text-xs text-neutral-500">
+            <span className="block font-medium text-xs text-neutral-500">
               Claude reordena los cinco mejores y escribe el porqué. Tarda unos segundos más.
             </span>
           </span>
@@ -140,7 +136,7 @@ export default function OutfitsPage() {
       </section>
 
       {error !== null && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {error}
         </p>
       )}

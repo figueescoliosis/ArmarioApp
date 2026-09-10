@@ -99,17 +99,17 @@ export function GarmentCapture({ onSelected, disabled = false }: GarmentCaptureP
         onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
         disabled={busy}
-        className={`flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-6 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed disabled:opacity-60 ${
-          dragActive ? "border-clay-500 bg-clay-50" : "border-neutral-300 bg-bone-soft"
+        className={`flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-dashed p-6 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed disabled:opacity-60 ${
+          dragActive ? "border-clay-500 bg-clay-100" : "border-clay-300 bg-clay-50"
         }`}
       >
         <GalleryIcon />
-        <span className="text-sm font-medium text-ink">Arrastra una foto aquí</span>
-        <span className="text-xs text-ink-soft">o elige de la galería</span>
+        <span className="text-sm font-bold text-clay-700">Arrastra una foto aquí</span>
+        <span className="text-xs font-medium text-ink-soft">o elige de la galería</span>
       </button>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm font-medium text-red-700">
           {error}
         </p>
       )}
@@ -128,7 +128,7 @@ function CameraIcon() {
 
 function GalleryIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" className="text-ink-soft">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" className="text-clay-700">
       <rect x="3" y="4" width="18" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
       <path strokeLinecap="round" strokeLinejoin="round" d="m4 17 4.5-5 3.5 3.5L16 11l4 6" />
       <circle cx="8" cy="9" r="1.4" />

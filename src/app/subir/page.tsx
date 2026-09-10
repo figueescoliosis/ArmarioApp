@@ -16,6 +16,7 @@ import { GarmentCapture } from "@/components/upload/GarmentCapture";
 import { ImageCropper } from "@/components/upload/ImageCropper";
 import { TagReview } from "@/components/upload/TagReview";
 import { Button } from "@/components/ui/Button";
+import { Cabecera } from "@/components/ui/Cabecera";
 import { Spinner } from "@/components/ui/Spinner";
 import { ApiCallError, analyzeGarment, createGarment } from "@/lib/client-api";
 import type { PreparedImage } from "@/lib/image/prepare";
@@ -77,12 +78,10 @@ export default function SubirPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Añadir prenda</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Hazle una foto sobre un fondo liso. Del recorte y las etiquetas se encarga la app.
-        </p>
-      </header>
+      <Cabecera
+        titulo="Añadir prenda"
+        subtitulo="Hazle una foto sobre un fondo liso. Del recorte y las etiquetas se encarga la app."
+      />
 
       {error !== null && <ErrorNotice error={error} onDismiss={() => setError(null)} />}
 
@@ -118,11 +117,11 @@ export default function SubirPage() {
 
 function AnalyzingNotice() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-line bg-bone-soft px-6 py-16 text-center">
+    <div className="flex flex-col items-center gap-4 rounded-[28px] bg-surface px-6 py-16 text-center shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
       <Spinner />
       <div>
-        <p className="font-medium">Recortando el fondo y analizando la prenda…</p>
-        <p className="mt-1 text-sm text-neutral-500">Suele tardar entre cinco y quince segundos.</p>
+        <p className="titulo text-[17px]">Recortando el fondo y analizando la prenda…</p>
+        <p className="mt-1 text-xs font-medium text-neutral-500">Suele tardar entre cinco y quince segundos.</p>
       </div>
     </div>
   );
@@ -131,7 +130,7 @@ function AnalyzingNotice() {
 function PipelineSummary({ analysis }: { analysis: AnalyzeGarmentResult }) {
   const seconds = (analysis.timings.totalMs / 1000).toFixed(1);
   return (
-    <p className="text-xs text-neutral-500">
+    <p className="px-1 text-xs font-medium text-neutral-500">
       Recortado con {analysis.backgroundProvider} y etiquetado en {seconds}s. Revisa lo que ha
       deducido y corrige lo que no cuadre antes de guardar.
     </p>
@@ -153,7 +152,7 @@ function ErrorNotice({
   return (
     <div
       role="alert"
-      className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900"
+      className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700"
     >
       <p className="font-medium">{error.message}</p>
       {error.missingEnvVar !== undefined && (

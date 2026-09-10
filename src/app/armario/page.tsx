@@ -7,6 +7,7 @@ import { CategoryFilter } from "@/components/wardrobe/CategoryFilter";
 import { GarmentGrid } from "@/components/wardrobe/GarmentGrid";
 import { GarmentSheet } from "@/components/wardrobe/GarmentSheet";
 import { Button } from "@/components/ui/Button";
+import { Cabecera } from "@/components/ui/Cabecera";
 import { Chip } from "@/components/ui/Chip";
 import { deleteGarment, fetchGarments, updateGarment } from "@/lib/client-api";
 import { CATEGORIES, type Category, type Garment } from "@/lib/types";
@@ -57,28 +58,26 @@ export default function ArmarioPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-baseline justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {showArchived ? "Archivadas" : "Mi armario"}
-          </h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            {loading
-              ? "Cargando…"
-              : garments.length === 0
-                ? showArchived
-                  ? "No has archivado nada."
-                  : "Todavía no hay prendas."
-                : `${garments.length} ${garments.length === 1 ? "prenda" : "prendas"}`}
-          </p>
-        </div>
-        <Link href="/subir">
-          <Button>Añadir</Button>
-        </Link>
-      </header>
+      <Cabecera
+        titulo={showArchived ? "Archivadas" : "Mi armario"}
+        subtitulo={
+          loading
+            ? "Cargando…"
+            : garments.length === 0
+              ? showArchived
+                ? "No has archivado nada."
+                : "Todavía no hay prendas."
+              : `${garments.length} ${garments.length === 1 ? "prenda" : "prendas"}`
+        }
+        accion={
+          <Link href="/subir">
+            <Button>Añadir</Button>
+          </Link>
+        }
+      />
 
       {error !== null && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {error}
         </p>
       )}

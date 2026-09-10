@@ -24,7 +24,7 @@ export function GarmentGrid({
     return (
       <div className={GRID_CLASSES} aria-hidden="true">
         {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-          <div key={index} className="aspect-square animate-pulse rounded-2xl bg-neutral-200" />
+          <div key={index} className="aspect-square animate-pulse rounded-[22px] bg-clay-100" />
         ))}
       </div>
     );

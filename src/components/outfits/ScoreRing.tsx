@@ -1,21 +1,45 @@
-/** Anillo de progreso con el porcentaje del conjunto en el centro. */
-export function ScoreRing({ percent, tone = "bien" }: { percent: number; tone?: "bien" | "aviso" | "mal" }) {
-  const color =
-    tone === "mal"
-      ? "var(--color-red-500, #ef4444)"
-      : tone === "aviso"
-        ? "var(--color-amber-500, #f59e0b)"
-        : "var(--color-clay-500)";
+/** Anillo de progreso con el porcentaje de compatibilidad en el centro. */
+export function ScoreRing({
+  percent,
+  tone = "bien",
+  size = 100,
+}: {
+  percent: number;
+  tone?: "bien" | "aviso" | "mal";
+  size?: number;
+}) {
+  const colors = {
+    bien: { arc: "var(--color-clay-500)", track: "var(--color-clay-100)", text: "text-clay-700" },
+    aviso: { arc: "var(--color-amber-500)", track: "var(--color-amber-50)", text: "text-amber-900" },
+    mal: { arc: "var(--color-red-500)", track: "var(--color-red-100)", text: "text-red-700" },
+  }[tone];
+
+  const inner = Math.round(size * 0.76);
 
   return (
     <div
-      className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
-      style={{ background: `conic-gradient(${color} ${percent * 3.6}deg, var(--color-neutral-200) 0deg)` }}
+      className="relative flex shrink-0 items-center justify-center rounded-full"
+      style={{
+        width: size,
+        height: size,
+        background: `conic-gradient(${colors.arc} 0 ${percent}%, ${colors.track} ${percent}% 100%)`,
+      }}
       role="img"
-      aria-label={`Puntuación del conjunto: ${percent}%`}
+      aria-label={`Compatibilidad del conjunto: ${percent}%`}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface text-sm font-semibold text-ink">
-        {percent}%
+      <div
+        className="flex flex-col items-center justify-center rounded-full bg-surface"
+        style={{ width: inner, height: inner }}
+      >
+        <span
+          className={`font-display font-extrabold leading-none ${colors.text}`}
+          style={{ fontSize: Math.round(size * 0.23) }}
+        >
+          {percent}%
+        </span>
+        <span className="mt-0.5 text-[8px] font-bold tracking-[0.6px] text-ink-soft">
+          COMBINA
+        </span>
       </div>
     </div>
   );

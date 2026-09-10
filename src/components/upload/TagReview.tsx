@@ -122,13 +122,13 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div className="checkerboard mx-auto flex h-64 w-64 max-w-full items-center justify-center overflow-hidden rounded-2xl">
+      <div className="checkerboard mx-auto flex h-64 w-64 max-w-full items-center justify-center overflow-hidden rounded-[28px] shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
         {/* eslint-disable-next-line @next/next/no-img-element -- imagen local aún sin subir, no cabe en el loader de next/image */}
         <img src={imageUrl} alt="Recorte de la prenda" className="h-full w-full object-contain" />
       </div>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-ink">Categoría</h3>
+        <h3 className="titulo text-[15px]">Categoría</h3>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((category) => (
             <Chip
@@ -142,7 +142,7 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
       </section>
 
       <section className="flex flex-col gap-2">
-        <label htmlFor="subcategory" className="text-sm font-semibold text-ink">
+        <label htmlFor="subcategory" className="titulo text-[15px]">
           Tipo de prenda
         </label>
         <input
@@ -151,28 +151,28 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
           value={attrs.subcategory}
           onChange={(event) => setAttrs((prev) => ({ ...prev, subcategory: event.target.value }))}
           placeholder="Ej. camisa de vestir"
-          className="h-11 rounded-xl border border-neutral-300 bg-surface px-3 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
+          className="h-11 rounded-2xl border-[1.5px] border-clay-200 bg-surface px-3 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
         />
       </section>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-ink">Colores</h3>
+        <h3 className="titulo text-[15px]">Colores</h3>
         <div className="flex flex-col gap-2">
           {attrs.colors.map((color, index) => (
-            <div key={index} className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-surface p-2">
+            <div key={index} className="flex items-center gap-2 rounded-2xl bg-surface p-2 shadow-[0_4px_12px_rgb(247_168_196_/_0.2)]">
               <input
                 type="color"
                 aria-label={`Color hexadecimal ${index + 1}`}
                 value={/^#[0-9a-fA-F]{6}$/.test(color.hex) ? color.hex : "#888888"}
                 onChange={(event) => updateColor(index, { hex: event.target.value })}
-                className="h-9 w-11 shrink-0 cursor-pointer rounded-lg border border-neutral-300"
+                className="h-9 w-11 shrink-0 cursor-pointer rounded-xl border-[1.5px] border-clay-200"
               />
               <input
                 type="text"
                 value={color.name}
                 onChange={(event) => updateColor(index, { name: event.target.value })}
                 placeholder="Nombre del color"
-                className="h-9 min-w-0 flex-1 rounded-lg border border-neutral-300 bg-transparent px-2 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
+                className="h-9 min-w-0 flex-1 rounded-xl border-[1.5px] border-clay-200 bg-transparent px-2 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
               />
               <Button
                 variant="ghost"
@@ -193,7 +193,7 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
       </section>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-ink">Patrón</h3>
+        <h3 className="titulo text-[15px]">Patrón</h3>
         <div className="flex flex-wrap gap-2">
           {PATTERNS.map((pattern) => (
             <Chip
@@ -207,7 +207,7 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
       </section>
 
       <section className="flex flex-col gap-2">
-        <label htmlFor="material" className="text-sm font-semibold text-ink">
+        <label htmlFor="material" className="titulo text-[15px]">
           Material <span className="font-normal text-ink-soft">(opcional)</span>
         </label>
         <input
@@ -218,26 +218,26 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
             setAttrs((prev) => ({ ...prev, material: event.target.value === "" ? null : event.target.value }))
           }
           placeholder="Ej. algodón"
-          className="h-11 rounded-xl border border-neutral-300 bg-surface px-3 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
+          className="h-11 rounded-2xl border-[1.5px] border-clay-200 bg-surface px-3 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
         />
       </section>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-ink">
+        <h3 className="titulo text-[15px]">
           Estilo <span className="font-normal text-ink-soft">(máximo {MAX_TAGS})</span>
         </h3>
         <div className="flex flex-wrap gap-2">
           {attrs.styleTags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-bone-soft px-3 text-sm text-ink"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-clay-50 px-3 text-sm font-semibold text-clay-700"
             >
               {tag}
               <button
                 type="button"
                 aria-label={`Quitar etiqueta ${tag}`}
                 onClick={() => removeTag(tag)}
-                className="text-ink-soft hover:text-ink"
+                className="text-clay-700 hover:text-ink"
               >
                 <CloseIcon />
               </button>
@@ -252,13 +252,13 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
             onKeyDown={handleTagKeyDown}
             onBlur={commitTag}
             placeholder="Escribe y pulsa Enter o coma"
-            className="h-11 rounded-xl border border-neutral-300 bg-surface px-3 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
+            className="h-11 rounded-2xl border-[1.5px] border-clay-200 bg-surface px-3 text-sm text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
           />
         )}
       </section>
 
       <section className="flex flex-col gap-2">
-        <label htmlFor="formality" className="text-sm font-semibold text-ink">
+        <label htmlFor="formality" className="titulo text-[15px]">
           Formalidad
         </label>
         <input
@@ -273,11 +273,11 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
           }
           className="accent-clay-500"
         />
-        <p className="text-center text-sm text-ink-soft">{FORMALITY[attrs.formality]}</p>
+        <p className="text-center text-sm font-semibold text-clay-700">{FORMALITY[attrs.formality]}</p>
       </section>
 
       <section className="flex flex-col gap-2">
-        <label htmlFor="warmth" className="text-sm font-semibold text-ink">
+        <label htmlFor="warmth" className="titulo text-[15px]">
           Abrigo
         </label>
         <input
@@ -290,11 +290,11 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
           onChange={(event) => setAttrs((prev) => ({ ...prev, warmth: Number(event.target.value) as Warmth }))}
           className="accent-clay-500"
         />
-        <p className="text-center text-sm text-ink-soft">{WARMTH_LABELS[attrs.warmth - 1]}</p>
+        <p className="text-center text-sm font-semibold text-clay-700">{WARMTH_LABELS[attrs.warmth - 1]}</p>
       </section>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-ink">Temporadas</h3>
+        <h3 className="titulo text-[15px]">Temporadas</h3>
         <div className="flex flex-wrap gap-2">
           {SEASONS.map((season) => (
             <Chip
@@ -309,7 +309,7 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
 
       {/* Por encima del menú (z-40), no debajo: mientras se revisan las etiquetas
           estos dos botones son la única salida del paso, y el menú los tapaba. */}
-      <div className="fixed inset-x-0 bottom-0 z-50 flex gap-3 border-t border-neutral-200 bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="fixed inset-x-0 bottom-0 z-50 flex gap-3 rounded-t-[28px] bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(247_168_196_/_0.35)]">
         <Button variant="secondary" size="lg" className="flex-1" onClick={onCancel} disabled={saving}>
           Cancelar
         </Button>

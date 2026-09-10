@@ -13,8 +13,33 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/Button";
-import { Chip } from "@/components/ui/Chip";
-import { FORMALITY, type Garment } from "@/lib/types";
+import { FORMALITY, type Category, type Garment } from "@/lib/types";
+
+const CATEGORY_LABELS: Record<Category, string> = {
+  top: "Arriba",
+  bottom: "Abajo",
+  dress: "Vestido",
+  outerwear: "Abrigo",
+  shoes: "Calzado",
+  accessory: "Accesorio",
+};
+
+const TONOS = {
+  rosa: "bg-clay-50 text-clay-700",
+  celeste: "bg-sky-50 text-sky-700",
+  lila: "bg-lilac-50 text-lilac-700",
+  crema: "bg-amber-50 text-ink-soft",
+} as const;
+
+function Etiqueta({
+  tono,
+  children,
+}: {
+  tono: keyof typeof TONOS;
+  children: React.ReactNode;
+}) {
+  return <span className={`rounded-full px-3 py-2 ${TONOS[tono]}`}>{children}</span>;
+}
 
 export interface GarmentSheetProps {
   garment: Garment | null;
@@ -58,13 +83,15 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="m-auto w-[92vw] max-w-md rounded-2xl border border-line bg-bone p-4 backdrop:bg-black/40"
+      className="fixed bottom-0 left-0 right-0 top-auto m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-[30px] bg-surface p-0 shadow-[0_-14px_40px_rgb(176_58_98_/_0.22)]"
     >
       {garment !== null && (
-        <div className="flex flex-col gap-4">
+        <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-5 pb-6 pt-3.5">
+          {/* Agarradera: la pista de que la hoja se puede cerrar. */}
+          <div aria-hidden="true" className="mx-auto h-[5px] w-[46px] rounded-full bg-clay-200" />
           <div
-            className="relative aspect-square w-full overflow-hidden rounded-xl"
-            style={{ backgroundColor: `color-mix(in srgb, ${garment.primaryHex} 16%, var(--color-bone))` }}
+            className="relative aspect-square w-full overflow-hidden rounded-3xl p-3"
+            style={{ backgroundColor: `color-mix(in srgb, ${garment.primaryHex} 10%, var(--color-clay-50))` }}
           >
             <Image
               src={garment.cutoutUrl}
@@ -76,24 +103,34 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold">{garment.subcategory}</h2>
-            <p className="text-sm text-neutral-500">
-              {FORMALITY[garment.formality]}
-              {garment.material !== null ? ` · ${garment.material}` : ""}
-              {garment.seasons.length > 0 ? ` · ${garment.seasons.join(", ")}` : ""}
+            <h2 className="titulo text-2xl">{garment.subcategory}</h2>
+            <p className="mt-0.5 text-xs font-medium text-neutral-500">
+              Añadida el {new Date(garment.createdAt).toLocaleDateString("es-ES", {
+                day: "numeric",
+                month: "long",
+              })}
             </p>
           </div>
 
-          {garment.styleTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {garment.styleTags.map((tag) => (
-                <Chip key={tag} label={tag} />
-              ))}
-            </div>
-          )}
+          {/* Las etiquetas van por familias de color, como en el diseño. */}
+          <div className="flex flex-wrap gap-[7px] text-xs font-semibold">
+            <Etiqueta tono="rosa">{CATEGORY_LABELS[garment.category]}</Etiqueta>
+            <Etiqueta tono="celeste">{`${FORMALITY[garment.formality]} · ${garment.formality}`}</Etiqueta>
+            {garment.material !== null && <Etiqueta tono="lila">{garment.material}</Etiqueta>}
+            {garment.seasons.map((season) => (
+              <Etiqueta key={season} tono="crema">
+                {season}
+              </Etiqueta>
+            ))}
+            {garment.styleTags.map((tag) => (
+              <Etiqueta key={tag} tono="lila">
+                {tag}
+              </Etiqueta>
+            ))}
+          </div>
 
           {error !== null && (
-            <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+            <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
               {error}
             </p>
           )}
@@ -109,7 +146,7 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
             </Button>
 
             <Button
-              variant="secondary"
+              variant="danger"
               size="lg"
               disabled={busy}
               onClick={() => {
@@ -120,10 +157,11 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
                 void run(() => onDelete(garment));
               }}
             >
-              {confirming ? "¿Seguro? Toca otra vez para borrarla" : "Eliminar para siempre"}
+              <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-red-500" />
+              {confirming ? "¿Seguro? Toca otra vez" : "Eliminar para siempre"}
             </Button>
 
-            <Button variant="ghost" size="md" disabled={busy} onClick={onClose}>
+            <Button variant="ghost" size="lg" disabled={busy} onClick={onClose}>
               Cerrar
             </Button>
           </div>

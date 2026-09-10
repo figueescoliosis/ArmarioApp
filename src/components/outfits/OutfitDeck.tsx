@@ -32,7 +32,7 @@ export function OutfitDeck({ outfits, onToggleFavorite, onWear, loading = false 
     return (
       <div className="flex gap-4 overflow-x-hidden" aria-hidden="true">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="h-96 w-full max-w-sm shrink-0 animate-pulse rounded-3xl bg-neutral-200" />
+          <div key={index} className="h-96 w-full max-w-sm shrink-0 animate-pulse rounded-[28px] bg-clay-100" />
         ))}
       </div>
     );
@@ -67,7 +67,7 @@ export function OutfitDeck({ outfits, onToggleFavorite, onWear, loading = false 
               key={outfit.id}
               aria-hidden="true"
               className={`h-1.5 rounded-full transition-all ${
-                index === activeIndex ? "w-4 bg-clay-500" : "w-1.5 bg-neutral-300"
+                index === activeIndex ? "w-4 bg-clay-500" : "w-1.5 bg-clay-200"
               }`}
             />
           ))}

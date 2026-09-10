@@ -18,6 +18,8 @@ import { ScoreRing } from "@/components/outfits/ScoreRing";
 import { GarmentGrid } from "@/components/wardrobe/GarmentGrid";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Cabecera } from "@/components/ui/Cabecera";
+import { Lazo } from "@/components/ui/Lazo";
 import {
   critiqueLook,
   fetchGarments,
@@ -139,23 +141,23 @@ export default function ProbadorPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Header />
+    <div className="space-y-4">
+      <Header {...(items.length > 0 ? { onVaciar: () => setLook({}) } : {})} />
 
       {error !== null && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {error}
         </p>
       )}
 
-      <section className="flex items-start gap-4 rounded-3xl border border-neutral-200 bg-surface p-4 shadow-sm">
-        <MannequinGrid items={items} onSlotClick={setPicking} />
+      <section className="flex items-start gap-3 rounded-[28px] bg-surface p-[13px] shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
+        <MannequinGrid items={items} onSlotClick={setPicking} alerta={graves.length > 0} />
         {/* El hueco del anillo se reserva siempre: si apareciera y desapareciera,
             el maniquí se estrecharía y los huecos se moverían bajo el dedo justo
             cuando el usuario va a tocar el siguiente.
             Con un desajuste grave el porcentaje no significa nada — el motor ni
             siquiera propondría ese conjunto — así que manda la alerta, no el número. */}
-        <div className="w-16 shrink-0">
+        <div className="w-[100px] shrink-0">
           {enoughPieces && graves.length === 0 && (
             <ScoreRing
               percent={Math.round(evaluation.score * 100)}
@@ -166,31 +168,33 @@ export default function ProbadorPage() {
       </section>
 
       {!enoughPieces ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm font-medium text-neutral-500">
           Toca un hueco para elegir prenda. Con dos ya te digo si pega.
         </p>
       ) : graves.length > 0 ? (
         <Alerta
           tono="mal"
           titulo="Mis-match"
+          subtitulo="Así no, mejor cambia una prenda"
           mensajes={graves.map((issue) => issue.message)}
           extra={leves.map((issue) => issue.message)}
         />
       ) : leves.length > 0 ? (
-        <Alerta tono="aviso" titulo="Casi" mensajes={leves.map((issue) => issue.message)} />
+        <Alerta
+          tono="aviso"
+          titulo="Casi"
+          subtitulo="Funciona, pero hay un detalle"
+          mensajes={leves.map((issue) => issue.message)}
+        />
       ) : (
-        <blockquote className="border-l-4 border-clay-300 pl-3 text-sm italic text-ink-soft">
-          “{critique ?? evaluation.rationale}”
-        </blockquote>
+        <Cita texto={critique ?? evaluation.rationale} deIA={critique !== null} />
       )}
 
       {critique !== null && evaluation.issues.length > 0 && (
-        <blockquote className="border-l-4 border-clay-300 pl-3 text-sm italic text-ink-soft">
-          “{critique}”
-        </blockquote>
+        <Cita texto={critique} deIA />
       )}
 
-      {done !== null && <p className="text-sm text-clay-500">{done}</p>}
+      {done !== null && <p className="text-sm font-semibold text-clay-700">{done}</p>}
 
       <div className="flex flex-col gap-2">
         <Button
@@ -251,12 +255,12 @@ export default function ProbadorPage() {
       <dialog
         ref={dialogRef}
         onClose={() => setPicking(null)}
-        className="m-auto w-[92vw] max-w-2xl rounded-2xl border border-line bg-bone p-4 backdrop:bg-black/40"
+        className="m-auto w-[92vw] max-w-2xl rounded-[28px] bg-bone p-4 shadow-[0_12px_30px_rgb(247_168_196_/_0.3)]"
       >
         {picking !== null && (
           <>
             <div className="mb-3 flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold">Elige prenda</h2>
+              <h2 className="titulo text-[22px]">Elige prenda</h2>
               <div className="flex gap-2">
                 {look[picking] !== undefined && (
                   <Button variant="ghost" onClick={() => choose(picking, null)}>
@@ -283,41 +287,78 @@ export default function ProbadorPage() {
   );
 }
 
-function Header() {
+function Header({ onVaciar }: { onVaciar?: () => void }) {
   return (
-    <header>
-      <h1 className="text-2xl font-semibold tracking-tight">Probador</h1>
-      <p className="mt-1 text-sm text-neutral-500">
-        Monta el look tú misma y te aviso si algo no pega.
+    <Cabecera
+      titulo="Probador"
+      subtitulo="Toca un hueco para elegir prenda"
+      accion={
+        onVaciar && (
+          <button
+            type="button"
+            onClick={onVaciar}
+            className="flex h-9 items-center rounded-full border-[1.5px] border-clay-200 bg-surface px-3 text-xs font-bold text-clay-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
+          >
+            Vaciar
+          </button>
+        )
+      }
+    />
+  );
+}
+
+/** La frase del estilista, en la tarjeta crema del diseño. */
+function Cita({ texto, deIA }: { texto: string; deIA: boolean }) {
+  return (
+    <div className="rounded-[20px] bg-amber-50 p-3">
+      <p className="text-xs italic leading-relaxed text-amber-900">«{texto}»</p>
+      <p className="mt-2 text-[10px] font-bold tracking-[0.6px] text-ink-soft">
+        — CHER, {deIA ? "REGLAS + IA" : "REGLAS"}
       </p>
-    </header>
+    </div>
   );
 }
 
 function Alerta({
   tono,
   titulo,
+  subtitulo,
   mensajes,
   extra = [],
 }: {
   tono: "mal" | "aviso";
   titulo: string;
+  subtitulo: string;
   mensajes: string[];
   extra?: string[];
 }) {
-  const clase =
-    tono === "mal"
-      ? "border-red-200 bg-red-50 text-red-900"
-      : "border-amber-200 bg-amber-50 text-amber-900";
+  const mal = tono === "mal";
 
   return (
-    <div role="alert" className={`rounded-xl border p-4 text-sm ${clase}`}>
-      <p className="font-semibold">{titulo}</p>
-      <ul className="mt-1 list-disc space-y-0.5 pl-5">
-        {[...mensajes, ...extra].map((mensaje, index) => (
-          <li key={index}>{mensaje}</li>
-        ))}
-      </ul>
+    <div
+      role="alert"
+      className={`flex items-start gap-3.5 rounded-3xl border-[1.5px] p-3.5 ${
+        mal ? "border-red-200 bg-red-50" : "border-amber-200 bg-amber-50"
+      }`}
+    >
+      <Lazo size={22} tone={mal ? "triste" : "rosa"} className="mt-1 flex-none" />
+      <div className="flex-1">
+        <p className={`titulo text-xl ${mal ? "text-red-700" : "text-amber-900"}`}>{titulo}</p>
+        <p className="mt-0.5 text-xs font-medium text-neutral-500">{subtitulo}</p>
+        <ul className="mt-2.5 flex flex-col gap-1.5">
+          {[...mensajes, ...extra].map((mensaje, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <span
+                aria-hidden="true"
+                className={`mt-1.5 h-1.5 w-1.5 flex-none rounded-full ${
+                  mal ? "bg-red-500" : "bg-amber-500"
+                }`}
+              />
+              <span className="text-xs font-semibold leading-relaxed text-ink">{mensaje}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

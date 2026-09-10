@@ -165,7 +165,7 @@ export function ImageCropper({ image, onCropped, onSkip }: ImageCropperProps) {
       <div className="mx-auto w-full max-w-md">
         <div
           ref={containerRef}
-          className="relative w-full touch-none overflow-hidden rounded-2xl bg-neutral-900"
+          className="relative w-full touch-none overflow-hidden rounded-[24px] bg-neutral-900"
           style={{ aspectRatio: `${image.width} / ${image.height}` }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- dataUrl local, no cabe en el loader de next/image */}
@@ -203,7 +203,7 @@ export function ImageCropper({ image, onCropped, onSkip }: ImageCropperProps) {
       </div>
 
       {error && (
-        <p role="alert" className="text-center text-sm text-red-600">
+        <p role="alert" className="text-center text-sm font-medium text-red-700">
           {error}
         </p>
       )}

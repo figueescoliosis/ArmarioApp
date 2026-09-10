@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { OutfitDeck } from "@/components/outfits/OutfitDeck";
+import { Cabecera } from "@/components/ui/Cabecera";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { fetchFavorites, logWear, removeFavorite } from "@/lib/client-api";
 import type { Outfit } from "@/lib/types";
@@ -43,13 +44,10 @@ export default function FavoritosPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Favoritos</h1>
-        <p className="mt-1 text-sm text-neutral-500">Los conjuntos que has guardado.</p>
-      </header>
+      <Cabecera titulo="Favoritos" subtitulo="Los conjuntos que has guardado." />
 
       {error !== null && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {error}
         </p>
       )}

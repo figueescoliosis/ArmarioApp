@@ -11,17 +11,18 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-clay-500 text-bone hover:bg-clay-600 active:bg-clay-700 disabled:bg-neutral-200 disabled:text-neutral-400",
+    "bg-clay-500 text-white font-bold shadow-[0_10px_22px_rgb(247_168_196_/_0.55)] hover:bg-clay-600 disabled:bg-clay-200 disabled:text-white disabled:shadow-none",
   secondary:
-    "bg-bone-soft text-ink border border-neutral-300 hover:bg-neutral-100 disabled:text-neutral-400 disabled:bg-bone-soft",
-  ghost: "bg-transparent text-ink hover:bg-bone-soft disabled:text-neutral-400",
+    "bg-surface text-clay-700 font-bold border-[1.5px] border-clay-200 hover:bg-bone-soft disabled:text-neutral-400",
+  // El celeste es el "salir de aquí" del diseño: cerrar, cancelar, volver.
+  ghost: "bg-sky-50 text-sky-700 font-bold hover:bg-sky-100 disabled:text-neutral-400",
   danger:
-    "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 disabled:bg-neutral-200 disabled:text-neutral-400",
+    "bg-red-50 text-red-700 font-bold border-[1.5px] border-red-500 hover:bg-red-100 disabled:text-neutral-400 disabled:border-clay-200",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
   md: "h-11 min-w-11 px-4 text-sm",
-  lg: "h-14 min-w-14 px-6 text-base",
+  lg: "h-14 min-w-14 px-6 text-[17px]",
   icon: "h-11 w-11 p-0",
 };
 
@@ -37,7 +38,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-[20px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
       {...props}
     >
       {children}

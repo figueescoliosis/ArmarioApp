@@ -16,24 +16,31 @@ export function Chip({
   disabled = false,
   className = "",
 }: ChipProps) {
+  const Tag = onClick ? "button" : "span";
+
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      disabled={disabled}
-      className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+    <Tag
+      {...(onClick
+        ? { type: "button" as const, "aria-pressed": selected, onClick, disabled }
+        : {})}
+      className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-[15px] text-[13px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed disabled:opacity-50 ${
         selected
-          ? "border-clay-500 bg-clay-500 text-bone"
-          : "border-neutral-300 bg-surface text-ink hover:bg-bone-soft"
+          ? "bg-clay-500 font-bold text-white shadow-[0_6px_14px_rgb(247_168_196_/_0.5)]"
+          : "border-[1.5px] border-clay-200 bg-surface font-semibold text-ink-soft hover:bg-bone-soft"
       } ${className}`}
     >
       <span>{label}</span>
       {typeof count === "number" && (
-        <span className={selected ? "text-xs text-bone/80" : "text-xs text-ink-soft"}>
+        <span
+          className={
+            selected
+              ? "rounded-full bg-white px-[7px] py-0.5 text-[11px] font-bold text-clay-700"
+              : "text-[11px] font-bold text-clay-700"
+          }
+        >
           {count}
         </span>
       )}
-    </button>
+    </Tag>
   );
 }

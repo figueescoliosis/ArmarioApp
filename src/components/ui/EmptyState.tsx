@@ -8,12 +8,12 @@ export interface EmptyStateProps {
 
 export function EmptyState({ message, title, icon }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-neutral-300 bg-bone-soft px-6 py-12 text-center">
-      <div className="text-neutral-400" aria-hidden="true">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-[28px] border-2 border-dashed border-clay-200 bg-clay-50 px-6 py-12 text-center">
+      <div className="text-clay-300" aria-hidden="true">
         {icon ?? <HangerIcon />}
       </div>
-      {title && <p className="text-base font-medium text-ink">{title}</p>}
-      <p className="max-w-xs text-sm text-ink-soft">{message}</p>
+      {title && <p className="titulo text-[17px]">{title}</p>}
+      <p className="max-w-xs text-sm font-medium text-ink-soft">{message}</p>
     </div>
   );
 }
