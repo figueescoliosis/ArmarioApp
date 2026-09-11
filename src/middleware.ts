@@ -7,23 +7,26 @@
  * los servicios de pago. Esto es lo mínimo que lo impide.
  *
  * Sin `APP_PASSWORD` no pide nada, para que `npm run dev` en local siga siendo
- * inmediato. En el despliegue la variable es obligatoria.
+ * inmediato. En el despliegue la variable es obligatoria. El usuario sale de
+ * `APP_USER`, y si no está, de "admin".
  */
 
 import { NextRequest, NextResponse } from "next/server";
 
-const USER = "admin";
-
 export function middleware(request: NextRequest) {
   const expected = process.env.APP_PASSWORD;
   if (!expected) return NextResponse.next();
+
+  // El usuario también es configurable; "admin" es lo que había antes de que
+  // lo fuera, así que un despliegue sin `APP_USER` sigue funcionando igual.
+  const expectedUser = process.env.APP_USER || "admin";
 
   const header = request.headers.get("authorization");
 
   if (header?.startsWith("Basic ")) {
     // atob en vez de Buffer: el middleware corre en el runtime Edge.
     const [user, ...rest] = atob(header.slice(6)).split(":");
-    if (user === USER && timingSafeEqual(rest.join(":"), expected)) {
+    if (user === expectedUser && timingSafeEqual(rest.join(":"), expected)) {
       return NextResponse.next();
     }
   }

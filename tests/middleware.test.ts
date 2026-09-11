@@ -10,6 +10,7 @@ function request(credentials?: string) {
 
 afterEach(() => {
   delete process.env.APP_PASSWORD;
+  delete process.env.APP_USER;
 });
 
 describe("middleware", () => {
@@ -35,6 +36,13 @@ describe("middleware", () => {
   it("deja pasar con las credenciales correctas", () => {
     process.env.APP_PASSWORD = "clave-de-prueba";
     expect(middleware(request("admin:clave-de-prueba")).status).toBe(200);
+  });
+
+  it("usa el usuario de APP_USER cuando está configurado", () => {
+    process.env.APP_PASSWORD = "clave-de-prueba";
+    process.env.APP_USER = "otro-usuario";
+    expect(middleware(request("otro-usuario:clave-de-prueba")).status).toBe(200);
+    expect(middleware(request("admin:clave-de-prueba")).status).toBe(401);
   });
 
   it("admite dos puntos dentro de la contraseña", () => {
