@@ -11,9 +11,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-clay-500 text-white font-bold shadow-[0_10px_22px_rgb(247_168_196_/_0.55)] hover:bg-clay-600 disabled:bg-clay-200 disabled:text-white disabled:shadow-none",
+    "bg-clay-500 text-cream font-bold shadow-[var(--sombra-tarjeta)] hover:bg-clay-600 disabled:bg-clay-200 disabled:text-cream disabled:shadow-none",
   secondary:
-    "bg-surface text-clay-700 font-bold border-[1.5px] border-clay-200 hover:bg-bone-soft disabled:text-neutral-400",
+    "bg-surface text-ink font-bold border-[1.5px] border-clay-200 hover:bg-bone-soft disabled:text-neutral-400",
   // El celeste es el "salir de aquí" del diseño: cerrar, cancelar, volver.
   ghost: "bg-sky-50 text-sky-700 font-bold hover:bg-sky-100 disabled:text-neutral-400",
   danger:
@@ -38,7 +38,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center gap-2 rounded-[20px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-[18px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
       {...props}
     >
       {children}

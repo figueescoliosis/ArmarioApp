@@ -176,7 +176,7 @@ export function ImageCropper({ image, onCropped, onSkip }: ImageCropperProps) {
             onPointerMove={handlePointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
-            className="absolute cursor-move border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]"
+            className="absolute cursor-move border-2 border-cream shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]"
             style={{
               left: `${crop.x * 100}%`,
               top: `${crop.y * 100}%`,
@@ -195,7 +195,7 @@ export function ImageCropper({ image, onCropped, onSkip }: ImageCropperProps) {
                 onPointerCancel={endDrag}
                 className={`absolute flex h-11 w-11 cursor-pointer items-center justify-center touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 ${CORNER_POSITION[corner]}`}
               >
-                <span className="h-4 w-4 rounded-full border-2 border-clay-500 bg-white" />
+                <span className="h-4 w-4 rounded-full border-2 border-clay-500 bg-cream" />
               </button>
             ))}
           </div>

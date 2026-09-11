@@ -1,35 +1,70 @@
 @import "tailwindcss";
 
 /*
- * Paleta "kawaii pastel", tomada del diseño de Claude Design: rosa algodón
- * como color de marca, celeste nube como apoyo y un rosa oscuro para todo lo
- * que sea texto o icono sobre fondo claro.
+ * Dos temas, una sola maqueta.
+ *
+ * Vienen del proyecto de Claude Design "Diseño Cinnamoroll rosa y celeste",
+ * ficheros `Fairy v3` y `Coquette Dark v3`. Los dos dibujan exactamente las
+ * mismas diez pantallas con la paleta permutada, así que aquí solo hay tokens:
+ * ningún componente pregunta en qué tema está.
+ *
+ *   claro  = Fairy    · verde hada, encaje rosa, mariposas y flores prensadas
+ *   oscuro = Coquette · rosa coquette, encaje negro, lazos de lunares y lacre
+ *
+ * Aviso para quien venga luego: "Coquette Dark" es oscuro de estética, no de
+ * luminancia — su fondo es rosa claro y sus tarjetas son blancas. Es
+ * deliberado, no un token a medio cambiar. Por eso `color-scheme` sigue siendo
+ * `light` en los dos y `prefers-color-scheme: dark` solo decide con cuál se
+ * arranca.
  *
  * Los nombres de token son los de siempre (`clay`, `bone`, `neutral`) para no
- * tener que reescribir cada componente: lo que cambia es a qué color apuntan.
- * `clay` ya no es arcilla, es rosa; el nombre se queda porque renombrarlo son
- * doscientas ediciones que no cambian un píxel.
+ * reescribir doscientas clases que no cambiarían un píxel. Lo que cambia es a
+ * qué apunta cada uno. El mapa, de una vez por todas:
+ *
+ *   bone        fondo de página          clay-500/600/700  tinta (rellenos y texto)
+ *   bone-soft   hueco de la prenda       clay-200/100      bordes
+ *   surface     tarjeta y cabecera       accent            acento (nav activo)
+ *   ink         tinta                    accent-strong     cifras y enlaces
+ *   ink-soft    tinta suave              cream             texto sobre tinta
+ *   neutral-400 apagado (nav inactivo)   red-*             alerta de Mis-match
  */
 @theme {
   --font-sans: var(--font-quicksand), ui-sans-serif, system-ui, sans-serif;
-  /* Titulares: redonda y con carácter. */
-  --font-display: var(--font-baloo), var(--font-quicksand), system-ui, sans-serif;
+  /*
+   * Titulares: la manuscrita del tema. Se redefine por tema más abajo; aquí
+   * solo queda la cadena de reserva, que es la que se ve mientras carga.
+   */
+  --font-display: var(--font-caveat), ui-serif, cursive;
 
-  --color-bone: #fff7f9;
-  --color-bone-soft: #fff0f5;
+  /* ---- Fairy (tema claro, el de por defecto) ---- */
+
+  --color-bone: #fbfbf3;
+  --color-bone-soft: #f3f7eb;
   --color-surface: #ffffff;
-  --color-ink: #4a3a42;
-  --color-ink-soft: #7a5b68;
+  --color-ink: #36402c;
+  --color-ink-soft: #67725b;
 
-  /* Rosa. `clay-500` es el relleno de marca; `clay-700`, el texto sobre claro. */
-  --color-clay-50: #fff0f5;
-  --color-clay-100: #fbe3ec;
-  --color-clay-200: #fbd7e4;
-  --color-clay-300: #f7a8c4;
-  --color-clay-400: #f7a8c4;
-  --color-clay-500: #f7a8c4;
-  --color-clay-600: #ee93b4;
-  --color-clay-700: #b03a62;
+  /* Texto sobre tinta: el crema que lleva el menú y los botones primarios. */
+  --color-cream: #f4f8ea;
+  /* Acento: nav activo y contador del chip seleccionado. */
+  --color-accent: #e9a9bf;
+  /* Acento fuerte: cifras del desglose, enlaces, contadores de los chips. */
+  --color-accent-strong: #63784a;
+
+  /*
+   * `clay` era el rosa de marca y ahora es la tinta del tema: es el relleno de
+   * los chips activos, del botón primario y del anillo de puntuación, y el
+   * color de los titulares. El nombre se queda; renombrarlo son doscientas
+   * ediciones que no cambian un píxel.
+   */
+  --color-clay-50: #f3f7eb;
+  --color-clay-100: #e4edd6;
+  --color-clay-200: #dce3ce;
+  --color-clay-300: #a7b596;
+  --color-clay-400: #8ca173;
+  --color-clay-500: #36402c;
+  --color-clay-600: #2b3323;
+  --color-clay-700: #36402c;
 
   /* Celeste de apoyo: temperatura, compatibilidad, temporada, botón "Cerrar". */
   --color-sky-50: #eaf6fc;
@@ -44,39 +79,208 @@
   --color-lilac-500: #c8b6e2;
   --color-lilac-700: #6b5b8a;
 
-  /* Los "neutros" también son rosados: en esta paleta no hay gris frío. */
-  --color-neutral-50: #fffdfe;
-  --color-neutral-100: #fff0f5;
-  --color-neutral-200: #fbd7e4;
-  --color-neutral-300: #fbd7e4;
-  --color-neutral-400: #b99aa6;
-  --color-neutral-500: #8a6b77;
-  --color-neutral-600: #7a5b68;
-  --color-neutral-700: #6b5060;
-  --color-neutral-800: #57404c;
-  --color-neutral-900: #4a3a42;
+  /* Los "neutros" van teñidos del tema: en esta paleta no hay gris frío. */
+  --color-neutral-50: #fbfbf3;
+  --color-neutral-100: #f3f7eb;
+  --color-neutral-200: #dce3ce;
+  --color-neutral-300: #dce3ce;
+  --color-neutral-400: #a7b596;
+  --color-neutral-500: #67725b;
+  --color-neutral-600: #67725b;
+  --color-neutral-700: #4f5a45;
+  --color-neutral-800: #424c38;
+  --color-neutral-900: #36402c;
 
   /* Alertas: el rojo de la pantalla de Mis-match, no el rojo de Tailwind. */
-  --color-red-50: #fdeef0;
-  --color-red-100: #fbe0e4;
-  --color-red-200: #f3c3cc;
-  --color-red-500: #e4586f;
-  --color-red-600: #d9415c;
-  --color-red-700: #c93a52;
-  --color-red-800: #b33046;
-  --color-red-900: #c93a52;
+  --color-red-50: #fbedf1;
+  --color-red-100: #f7dde4;
+  --color-red-200: #b4536c;
+  --color-red-500: #b4536c;
+  --color-red-600: #a4485f;
+  --color-red-700: #b4536c;
+  --color-red-800: #8e3b50;
+  --color-red-900: #b4536c;
 
   /* Avisos leves: la crema de las tarjetas de consejo. */
-  --color-amber-50: #fff1d6;
-  --color-amber-200: #f4dfb8;
-  --color-amber-500: #e0a94a;
-  --color-amber-900: #6b5b4a;
+  --color-amber-50: #f4f8ea;
+  --color-amber-200: #dce3ce;
+  --color-amber-500: #8ca173;
+  --color-amber-900: #4f5a45;
 }
 
 /*
- * El diseño es de un solo tema: rosa claro. No hay variante oscura que imitar,
- * y dejar el modo oscuro anterior daba una app a medio camino entre dos
- * paletas. Se fija el esquema claro a propósito.
+ * Lo que no es color y también cambia de tema: la sombra de las tarjetas, la
+ * textura del fondo, la cinta de cuadros de la cabecera y los tres encajes.
+ * Van fuera de `@theme` porque no son utilidades de Tailwind, solo variables
+ * que leen los componentes.
+ */
+:root {
+  --sombra-tarjeta: 0 6px 16px rgb(120 140 105 / 0.18);
+  --sombra-hoja: 0 -14px 40px rgb(120 140 105 / 0.22);
+
+  /* Lunares verdes muy tenues, la textura de papelería de Fairy. */
+  --patron: radial-gradient(rgb(228 237 214 / 0.8) 1.3px, transparent 1.3px);
+  --patron-medida: 15px 15px;
+
+  /* Cinta de vichy bajo el borde superior de la cabecera. */
+  --vichy: repeating-conic-gradient(#8ca173 0 25%, #f4f8ea 0 50%);
+  --vichy-alto: 12px;
+  --vichy-medida: 12px 12px;
+
+  /* Encajes y volantes recortados del diseño. */
+  --encaje-cabecera: url("/decor/lb-pinkbows.png");
+  --encaje-cabecera-alto: 22px;
+  --encaje-tarjeta: url("/decor/lb-pinkbows.png");
+  --volante-menu: url("/decor/lb-pinkruffle.png");
+}
+
+/* ---- Coquette (tema oscuro) ---- */
+:root[data-tema="oscuro"] {
+  --font-display: var(--font-sacramento), ui-serif, cursive;
+
+  --color-bone: #fbeef2;
+  --color-bone-soft: #f9f1f4;
+  --color-surface: #ffffff;
+  --color-ink: #1b1620;
+  --color-ink-soft: #6e5e68;
+
+  --color-cream: #f7d9e4;
+  --color-accent: #f0a9c5;
+  --color-accent-strong: #a8436a;
+
+  --color-clay-50: #f9f1f4;
+  --color-clay-100: #fbeef2;
+  --color-clay-200: #e0cfd8;
+  --color-clay-300: #b9a8b2;
+  --color-clay-400: #e28aa8;
+  --color-clay-500: #1b1620;
+  --color-clay-600: #120e16;
+  --color-clay-700: #1b1620;
+
+  --color-neutral-50: #fbeef2;
+  --color-neutral-100: #f9f1f4;
+  --color-neutral-200: #e0cfd8;
+  --color-neutral-300: #e0cfd8;
+  --color-neutral-400: #b9a8b2;
+  --color-neutral-500: #6e5e68;
+  --color-neutral-600: #6e5e68;
+  --color-neutral-700: #4d4148;
+  --color-neutral-800: #332b31;
+  --color-neutral-900: #1b1620;
+
+  --color-red-50: #fbe7ec;
+  --color-red-100: #f7d5de;
+  --color-red-200: #c1365b;
+  --color-red-500: #c1365b;
+  --color-red-600: #ab2f51;
+  --color-red-700: #c1365b;
+  --color-red-800: #922845;
+  --color-red-900: #c1365b;
+
+  --color-amber-50: #f7d9e4;
+  --color-amber-200: #e0cfd8;
+  --color-amber-500: #e28aa8;
+  --color-amber-900: #4d4148;
+
+  --sombra-tarjeta: 0 6px 16px rgb(60 40 52 / 0.12);
+  --sombra-hoja: 0 -14px 40px rgb(60 40 52 / 0.2);
+
+  /* Cuadro vichy dibujado en CSS, la textura de Coquette. */
+  --patron: repeating-linear-gradient(
+      90deg,
+      rgb(168 67 106 / 0.12) 0 9px,
+      transparent 9px 18px
+    ),
+    repeating-linear-gradient(0deg, rgb(168 67 106 / 0.12) 0 9px, transparent 9px 18px);
+  --patron-medida: auto;
+
+  --vichy: repeating-conic-gradient(#1b1620 0 25%, #f7d9e4 0 50%);
+  --vichy-alto: 14px;
+  --vichy-medida: 14px 14px;
+
+  --encaje-cabecera: url("/decor/lb-bows.png");
+  --encaje-cabecera-alto: 26px;
+  --encaje-tarjeta: url("/decor/lb-tulle.png");
+  --volante-menu: url("/decor/lb-pinkruffle.png");
+}
+
+/*
+ * "Como el móvil": sin `data-tema` propio, manda la preferencia del sistema.
+ * El `:not` deja que elegir Fairy a mano gane sobre un móvil en oscuro.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]):not([data-tema="oscuro"]) {
+    --font-display: var(--font-sacramento), ui-serif, cursive;
+
+    --color-bone: #fbeef2;
+    --color-bone-soft: #f9f1f4;
+    --color-ink: #1b1620;
+    --color-ink-soft: #6e5e68;
+
+    --color-cream: #f7d9e4;
+    --color-accent: #f0a9c5;
+    --color-accent-strong: #a8436a;
+
+    --color-clay-50: #f9f1f4;
+    --color-clay-100: #fbeef2;
+    --color-clay-200: #e0cfd8;
+    --color-clay-300: #b9a8b2;
+    --color-clay-400: #e28aa8;
+    --color-clay-500: #1b1620;
+    --color-clay-600: #120e16;
+    --color-clay-700: #1b1620;
+
+    --color-neutral-50: #fbeef2;
+    --color-neutral-100: #f9f1f4;
+    --color-neutral-200: #e0cfd8;
+    --color-neutral-300: #e0cfd8;
+    --color-neutral-400: #b9a8b2;
+    --color-neutral-500: #6e5e68;
+    --color-neutral-600: #6e5e68;
+    --color-neutral-700: #4d4148;
+    --color-neutral-800: #332b31;
+    --color-neutral-900: #1b1620;
+
+    --color-red-50: #fbe7ec;
+    --color-red-100: #f7d5de;
+    --color-red-200: #c1365b;
+    --color-red-500: #c1365b;
+    --color-red-600: #ab2f51;
+    --color-red-700: #c1365b;
+    --color-red-800: #922845;
+    --color-red-900: #c1365b;
+
+    --color-amber-50: #f7d9e4;
+    --color-amber-200: #e0cfd8;
+    --color-amber-500: #e28aa8;
+    --color-amber-900: #4d4148;
+
+    --sombra-tarjeta: 0 6px 16px rgb(60 40 52 / 0.12);
+    --sombra-hoja: 0 -14px 40px rgb(60 40 52 / 0.2);
+
+    --patron: repeating-linear-gradient(
+        90deg,
+        rgb(168 67 106 / 0.12) 0 9px,
+        transparent 9px 18px
+      ),
+      repeating-linear-gradient(0deg, rgb(168 67 106 / 0.12) 0 9px, transparent 9px 18px);
+    --patron-medida: auto;
+
+    --vichy: repeating-conic-gradient(#1b1620 0 25%, #f7d9e4 0 50%);
+    --vichy-alto: 14px;
+    --vichy-medida: 14px 14px;
+
+    --encaje-cabecera: url("/decor/lb-bows.png");
+    --encaje-cabecera-alto: 26px;
+    --encaje-tarjeta: url("/decor/lb-tulle.png");
+    --volante-menu: url("/decor/lb-pinkruffle.png");
+  }
+}
+
+/*
+ * Los dos temas son claros: uno es verde hada y el otro rosa coquette, pero
+ * ninguno pinta sobre fondo oscuro. Decirle `light` al navegador evita que
+ * repinte por su cuenta los controles nativos.
  */
 html {
   color-scheme: light;
@@ -84,36 +288,67 @@ html {
 
 body {
   min-height: 100dvh;
-  background: var(--color-bone);
-  /* Cuadrícula rosa tenue: la textura de papelería del diseño. */
-  background-image: repeating-linear-gradient(
-      0deg,
-      rgb(247 168 196 / 0.09) 0 9px,
-      transparent 9px 18px
-    ),
-    repeating-linear-gradient(90deg, rgb(247 168 196 / 0.09) 0 9px, transparent 9px 18px);
+  background-color: var(--color-bone);
+  background-image: var(--patron);
+  background-size: var(--patron-medida);
   background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
   /* Deja sitio a la barra de navegación inferior fija de la app. */
-  padding-bottom: 4.875rem;
+  padding-bottom: 5.875rem;
 }
 
-/* Titulares de pantalla: Baloo 2 en rosa oscuro. */
+/* Titulares de pantalla: la manuscrita del tema, en tinta. */
 .titulo {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-clay-700);
-  letter-spacing: -0.01em;
+  line-height: 0.9;
+}
+
+/*
+ * Las tres cintas del diseño. Se repiten en horizontal a su altura real y no
+ * llevan texto encima nunca: son bordes, no fondos.
+ */
+.cinta-vichy {
+  height: var(--vichy-alto);
+  background-image: var(--vichy);
+  background-size: var(--vichy-medida);
+}
+
+.cinta-encaje {
+  height: var(--encaje-cabecera-alto);
+  background-image: var(--encaje-cabecera);
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: auto 100%;
+}
+
+.cinta-encaje-tarjeta {
+  height: 14px;
+  background-image: var(--encaje-tarjeta);
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: auto 100%;
+}
+
+/* El volante que remata el menú inferior, boca abajo como en el diseño. */
+.volante-menu {
+  height: 18px;
+  background-image: var(--volante-menu);
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: auto 100%;
+  transform: scaleY(-1);
 }
 
 /* Fondo a cuadros de transparencia, para previsualizar recortes sin fondo. */
 .checkerboard {
-  background-color: #fbfcfd;
-  background-image: linear-gradient(45deg, #e7edf2 25%, transparent 25%),
-    linear-gradient(-45deg, #e7edf2 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e7edf2 75%),
-    linear-gradient(-45deg, transparent 75%, #e7edf2 75%);
+  background-color: var(--color-surface);
+  background-image: linear-gradient(45deg, var(--color-clay-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-clay-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-clay-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-clay-100) 75%);
   background-size: 16px 16px;
   background-position:
     0 0,
@@ -140,5 +375,5 @@ input[type="range"] {
 
 /* Las hojas modales suben desde abajo, como en el diseño. */
 dialog::backdrop {
-  background: rgb(74 58 66 / 0.34);
+  background: color-mix(in srgb, var(--color-ink) 34%, transparent);
 }

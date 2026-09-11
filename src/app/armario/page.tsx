@@ -67,8 +67,13 @@ export default function ArmarioPage() {
               ? showArchived
                 ? "No has archivado nada."
                 : "Todavía no hay prendas."
-              : `${garments.length} ${garments.length === 1 ? "prenda" : "prendas"}`
+              : "Ordenado por lo último que añadiste"
         }
+        {...(garments.length > 0
+          ? {
+              contador: `${garments.length} ${garments.length === 1 ? "prenda" : "prendas"}`,
+            }
+          : {})}
         accion={
           <Link href="/subir">
             <Button>Añadir</Button>

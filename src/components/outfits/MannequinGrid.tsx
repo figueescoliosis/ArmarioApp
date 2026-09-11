@@ -84,13 +84,12 @@ function SlotCell({
   alerta: boolean;
   compacta: boolean;
 }) {
-  const radius = compacta ? "rounded-[18px]" : "rounded-[22px]";
   const innerRadius = compacta ? "rounded-[14px]" : "rounded-2xl";
 
-  const lleno = `relative ${radius} bg-bone-soft p-1.5 shadow-[0_6px_14px_rgb(247_168_196_/_0.2)] ${
-    alerta ? "border-2 border-red-200" : ""
+  const lleno = `relative rounded-[16px] bg-bone-soft p-1.5 shadow-[var(--sombra-tarjeta)] ${
+    alerta ? "border-2 border-red-500" : ""
   }`;
-  const vacio = `flex flex-col items-center justify-center gap-1.5 ${radius} border-[2.5px] border-dashed border-clay-500 bg-neutral-50`;
+  const vacio = "flex flex-col items-center justify-center gap-1.5 rounded-[16px] border-2 border-dashed border-clay-200 bg-neutral-50";
 
   const body = item ? (
     <div className={`relative h-full w-full overflow-hidden ${innerRadius} bg-clay-50`}>

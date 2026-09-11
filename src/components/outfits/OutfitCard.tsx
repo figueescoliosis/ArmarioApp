@@ -43,8 +43,8 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps
 
   return (
     <article className="flex flex-col gap-2.5">
-      <div className="rounded-[28px] bg-surface p-[13px] shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
-        {outfit.name !== null && <h3 className="titulo mb-2 px-1 text-[22px]">{outfit.name}</h3>}
+      <div className="rounded-[28px] bg-surface p-[13px] shadow-[var(--sombra-tarjeta)]">
+        {outfit.name !== null && <h3 className="titulo mb-2 px-1 text-[38px]">{outfit.name}</h3>}
 
         <div className="flex items-start gap-3">
           <MannequinGrid items={outfit.items} compacta />
@@ -71,7 +71,7 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps
         </div>
       </div>
 
-      <div className="rounded-3xl bg-surface p-[13px] shadow-[0_8px_22px_rgb(247_168_196_/_0.2)]">
+      <div className="rounded-3xl bg-surface p-[13px] shadow-[var(--sombra-tarjeta)]">
         <button
           type="button"
           aria-expanded={expanded}

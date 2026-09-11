@@ -25,8 +25,8 @@ export function Chip({
         : {})}
       className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-[15px] text-[13px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500 disabled:cursor-not-allowed disabled:opacity-50 ${
         selected
-          ? "bg-clay-500 font-bold text-white shadow-[0_6px_14px_rgb(247_168_196_/_0.5)]"
-          : "border-[1.5px] border-clay-200 bg-surface font-semibold text-ink-soft hover:bg-bone-soft"
+          ? "bg-clay-500 font-bold text-cream"
+          : "border-[1.5px] border-clay-200 bg-surface font-semibold text-ink hover:bg-bone-soft"
       } ${className}`}
     >
       <span>{label}</span>
@@ -34,8 +34,8 @@ export function Chip({
         <span
           className={
             selected
-              ? "rounded-full bg-white px-[7px] py-0.5 text-[11px] font-bold text-clay-700"
-              : "text-[11px] font-bold text-clay-700"
+              ? "rounded-full bg-accent px-[7px] py-0.5 text-[11px] font-bold text-clay-700"
+              : "text-[11px] font-bold text-accent-strong"
           }
         >
           {count}

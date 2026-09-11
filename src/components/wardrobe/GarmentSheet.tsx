@@ -83,7 +83,7 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="fixed bottom-0 left-0 right-0 top-auto m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-[30px] bg-surface p-0 shadow-[0_-14px_40px_rgb(176_58_98_/_0.22)]"
+      className="fixed bottom-0 left-0 right-0 top-auto m-0 max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-[30px] bg-surface p-0 shadow-[var(--sombra-hoja)]"
     >
       {garment !== null && (
         <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-5 pb-6 pt-3.5">

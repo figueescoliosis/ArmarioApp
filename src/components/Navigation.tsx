@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { Lazo } from "@/components/ui/Lazo";
-
 /** Iconos del diseño: línea de 2px con puntas redondeadas, todos del mismo grosor. */
 const ICONS: Record<string, ReactNode> = {
   armario: (
@@ -50,28 +48,24 @@ export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav
-      aria-label="Navegación principal"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-clay-100 bg-surface"
-      style={{ boxShadow: "0 -10px 24px rgb(247 168 196 / 0.18)" }}
-    >
-      <ul className="mx-auto flex w-full max-w-3xl">
-        {LINKS.map((link) => {
-          const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
-          return (
-            <li key={link.href} className="flex-1">
+    <div className="fixed inset-x-0 bottom-0 z-40">
+      <div className="volante-menu" />
+      <nav
+        aria-label="Navegación principal"
+        className="h-[76px] bg-clay-500 shadow-[var(--sombra-tarjeta)]"
+      >
+        <div className="mx-auto grid h-full w-full max-w-3xl grid-cols-5">
+          {LINKS.map((link) => {
+            const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            return (
               <Link
+                key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-[4.875rem] flex-col items-center justify-center gap-[3px] pb-[env(safe-area-inset-bottom)] transition-colors ${
-                  active ? "text-clay-700" : "text-ink-soft hover:text-clay-700"
+                className={`flex flex-col items-center justify-center gap-[3px] pb-[env(safe-area-inset-bottom)] transition-colors ${
+                  active ? "text-accent" : "text-neutral-400 hover:text-accent"
                 }`}
               >
-                {/* El lazo corona solo la pestaña activa; el hueco se reserva
-                    siempre para que los iconos no bailen al cambiar de página. */}
-                <span className="flex h-2 items-end">
-                  {active && <Lazo size={8} tone="rosa" />}
-                </span>
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -88,10 +82,10 @@ export function Navigation() {
                   {link.label}
                 </span>
               </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+            );
+          })}
+        </div>
+      </nav>
+    </div>
   );
 }

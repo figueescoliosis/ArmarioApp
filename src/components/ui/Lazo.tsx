@@ -19,12 +19,14 @@ export function Lazo({
   const petal = Math.round(size * 0.77);
   const knot = Math.round(size * 0.46);
 
+  // `triste` sale en la alerta de Mis-match y ahí el color es la mitad del
+  // mensaje: si se pinta igual que el lazo normal, el aviso deja de leerse de
+  // un vistazo. Los demás tonos sí comparten paleta —pétalos al acento, nudo a
+  // la tinta— y se distinguen solo por la forma.
   const colors =
     tone === "triste"
-      ? { left: "#F3AAB6", right: "#F3AAB6", knot: "#C93A52" }
-      : tone === "rosa"
-        ? { left: "#F7A8C4", right: "#F7A8C4", knot: "#B03A62" }
-        : { left: "#F7A8C4", right: "#A8D8F0", knot: "#B03A62" };
+      ? { petalo: "var(--color-red-500)", nudo: "var(--color-red-700)" }
+      : { petalo: "var(--color-accent)", nudo: "var(--color-clay-500)" };
 
   return (
     <span
@@ -37,7 +39,7 @@ export function Lazo({
           width: petal,
           height: size,
           borderRadius: `${size * 0.77}px ${size * 0.23}px ${size * 0.77}px ${size * 0.23}px`,
-          background: colors.left,
+          background: colors.petalo,
         }}
       />
       <span
@@ -45,7 +47,7 @@ export function Lazo({
           width: knot,
           height: knot,
           borderRadius: "50%",
-          background: colors.knot,
+          background: colors.nudo,
           marginBottom: size * 0.23,
         }}
       />
@@ -54,7 +56,7 @@ export function Lazo({
           width: petal,
           height: tone === "triste" ? size * 0.74 : size,
           borderRadius: `${size * 0.23}px ${size * 0.77}px ${size * 0.23}px ${size * 0.77}px`,
-          background: colors.right,
+          background: colors.petalo,
           transform: tone === "triste" ? "rotate(22deg)" : undefined,
         }}
       />

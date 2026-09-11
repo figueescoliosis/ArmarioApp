@@ -14,14 +14,14 @@ export function GarmentCard({ garment, onClick, selected = false }: GarmentCardP
   // recortes negros, que son la mayoría de un armario real.
   const softBg = `color-mix(in srgb, ${garment.primaryHex} 10%, var(--color-clay-50))`;
 
-  const cardClass = `group relative flex flex-col rounded-[22px] bg-bone-soft p-3 text-left shadow-[0_6px_16px_rgb(247_168_196_/_0.20)] transition-colors ${
-    selected ? "border-2 border-clay-500 p-[10px]" : ""
+  const cardClass = `relative overflow-hidden rounded-[20px] bg-surface p-[9px] pb-0 text-left shadow-[var(--sombra-tarjeta)] ${
+    selected ? "border-2 border-clay-500" : ""
   }`;
 
   const body = (
     <>
       <div
-        className="relative aspect-square w-full overflow-hidden rounded-2xl"
+        className="relative aspect-[3/4] w-full overflow-hidden rounded-[14px] bg-bone-soft"
         style={{ backgroundColor: softBg }}
       >
         <Image
@@ -32,20 +32,21 @@ export function GarmentCard({ garment, onClick, selected = false }: GarmentCardP
           className="object-contain p-2"
         />
       </div>
-      <div className="flex flex-col gap-2 pt-2.5">
+      <div className="flex items-center justify-between gap-1.5 py-[9px] px-0.5">
         <span className="line-clamp-2 text-[13px] font-semibold leading-tight text-ink">
           {garment.subcategory}
         </span>
-        <div className="flex gap-[5px]" aria-hidden="true">
+        <div className="flex shrink-0 gap-[5px]" aria-hidden="true">
           {garment.colors.slice(0, 4).map((color, index) => (
             <span
               key={index}
-              className="h-[11px] w-[11px] rounded-full border border-black/10"
-              style={{ backgroundColor: color.hex }}
+              className="h-[11px] w-[11px] rounded-full"
+              style={{ backgroundColor: color.hex, boxShadow: "inset 0 0 0 1px rgb(0 0 0 / .1)" }}
             />
           ))}
         </div>
       </div>
+      <div className="cinta-encaje-tarjeta mx-[-9px]" />
     </>
   );
 

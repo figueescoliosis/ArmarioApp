@@ -9,12 +9,12 @@ export function ScoreRing({
   size?: number;
 }) {
   const colors = {
-    bien: { arc: "var(--color-clay-500)", track: "var(--color-clay-100)", text: "text-clay-700" },
-    aviso: { arc: "var(--color-amber-500)", track: "var(--color-amber-50)", text: "text-amber-900" },
-    mal: { arc: "var(--color-red-500)", track: "var(--color-red-100)", text: "text-red-700" },
+    bien: { arc: "var(--color-clay-500)", track: "var(--color-clay-200)" },
+    aviso: { arc: "var(--color-amber-500)", track: "var(--color-amber-50)" },
+    mal: { arc: "var(--color-red-500)", track: "var(--color-red-100)" },
   }[tone];
 
-  const inner = Math.round(size * 0.76);
+  const inner = Math.round(size * 0.72);
 
   return (
     <div
@@ -31,10 +31,7 @@ export function ScoreRing({
         className="flex flex-col items-center justify-center rounded-full bg-surface"
         style={{ width: inner, height: inner }}
       >
-        <span
-          className={`font-display font-extrabold leading-none ${colors.text}`}
-          style={{ fontSize: Math.round(size * 0.23) }}
-        >
+        <span className="titulo leading-none" style={{ fontSize: Math.round(size * 0.36) }}>
           {percent}%
         </span>
         <span className="mt-0.5 text-[8px] font-bold tracking-[0.6px] text-ink-soft">
