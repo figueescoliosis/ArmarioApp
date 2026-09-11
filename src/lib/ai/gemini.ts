@@ -16,6 +16,9 @@ import * as z from "zod/v4";
 // persiguiendo deprecaciones. Se sobrescribe con `GEMINI_MODEL`.
 const DEFAULT_MODEL = "gemini-3.5-flash";
 
+/** Espera antes de cada reintento, si el modelo responde que está saturado. */
+const ESPERAS_MS = [2000, 4000];
+
 export interface GeminiPart {
   text?: string;
   inlineData?: { mimeType: string; data: string };
@@ -39,32 +42,44 @@ export async function geminiJson<T extends z.ZodType>(
 ): Promise<z.infer<T>> {
   const model = process.env.GEMINI_MODEL ?? DEFAULT_MODEL;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-    {
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: system }] },
+    contents: [{ role: "user", parts }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseJsonSchema: z.toJSONSchema(schema),
+    },
+  });
+
+  const pedir = () =>
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: [{ role: "user", parts }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseJsonSchema: z.toJSONSchema(schema),
-        },
-      }),
-    },
-  );
+      body,
+    });
+
+  // Un 503 de Gemini es saturación momentánea del modelo, no un problema de la
+  // petición: la propia respuesta pide que se reintente. Seis segundos de
+  // espera salen más baratos que hacer al usuario repetir la foto.
+  let response = await pedir();
+  for (const espera of ESPERAS_MS) {
+    if (response.status !== 503) break;
+    await new Promise((listo) => setTimeout(listo, espera));
+    response = await pedir();
+  }
 
   if (!response.ok) {
-    throw new Error(`Gemini respondió ${response.status}: ${(await response.text()).slice(0, 300)}`);
+    throw new Error(
+      `Gemini respondió ${response.status}: ${(await response.text()).slice(0, 300)}`,
+    );
   }
 
   // El JSON útil viaja como texto dentro de la primera parte del primer
   // candidato.
-  const body = (await response.json()) as {
+  const datos = (await response.json()) as {
     candidates?: { content?: { parts?: { text?: string }[] } }[];
   };
-  const text = body.candidates?.[0]?.content?.parts?.[0]?.text;
+  const text = datos.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (text === undefined) {
     throw new Error("Gemini devolvió una respuesta sin contenido.");
