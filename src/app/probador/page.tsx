@@ -211,7 +211,7 @@ export default function ProbadorPage() {
             })
           }
         >
-          {busy === "critica" ? "Preguntando…" : "¿Qué opina Cher?"}
+          {busy === "critica" ? "Preguntando…" : "¿Qué opina Mocha?"}
         </Button>
 
         <Button
@@ -313,7 +313,7 @@ function Cita({ texto, deIA }: { texto: string; deIA: boolean }) {
     <div className="rounded-[20px] bg-amber-50 p-3">
       <p className="text-xs italic leading-relaxed text-amber-900">«{texto}»</p>
       <p className="mt-2 text-[10px] font-bold tracking-[0.6px] text-ink-soft">
-        — CHER, {deIA ? "REGLAS + IA" : "REGLAS"}
+        — MOCHA, {deIA ? "REGLAS + IA" : "REGLAS"}
       </p>
     </div>
   );

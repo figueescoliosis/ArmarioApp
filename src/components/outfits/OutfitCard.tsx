@@ -66,7 +66,7 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps
         <div className="mt-2.5 rounded-[20px] bg-amber-50 p-3">
           <p className="text-xs italic leading-relaxed text-amber-900">«{outfit.rationale}»</p>
           <p className="mt-2 text-[10px] font-bold tracking-[0.6px] text-ink-soft">
-            — CHER, {outfit.source === "rules+llm" ? "REGLAS + IA" : "REGLAS"}
+            — MOCHA, {outfit.source === "rules+llm" ? "REGLAS + IA" : "REGLAS"}
           </p>
         </div>
       </div>

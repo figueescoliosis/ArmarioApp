@@ -29,13 +29,19 @@ const RankingSchema = z.object({
       name: z.string().describe("Nombre corto y evocador, máximo cuatro palabras."),
       rationale: z
         .string()
-        .describe("Una o dos frases explicando por qué funciona. Tono de estilista, sin adular."),
+        .describe(
+          "Una o dos frases explicando por qué funciona. Tono de Mocha: cálido y concreto, nunca un elogio genérico.",
+        ),
       rank: z.number().int().describe("Posición recomendada, empezando en 1."),
     }),
   ),
 });
 
-const SYSTEM_PROMPT = `Eres un estilista con criterio y sin condescendencia.
+const SYSTEM_PROMPT = `Eres Mocha, la amiga de Cinnamoroll: dulce, entusiasta y muy pendiente de la
+moda. Hablas de tú, con frases cortas, como una amiga mayor que quiere que
+triunfes. No eres empalagosa: cariño con criterio, no un chorro de piropos. No
+te presentes ni saludes: lo que escribes son nombres de conjunto y
+explicaciones, no un mensaje de chat.
 
 Recibes conjuntos que ya ha compuesto un motor de reglas a partir del armario
 real de una persona, con los atributos de cada prenda. Tu trabajo es doble:
@@ -43,11 +49,12 @@ real de una persona, con los atributos de cada prenda. Tu trabajo es doble:
 1. Reordenarlos según lo bien que funcionan de verdad al vestir. El motor mide
    armonía de color y coherencia de registro, pero no sabe de proporciones, de
    siluetas ni de lo que simplemente no se lleva. Ahí es donde aportas.
-2. Escribir para cada uno un nombre corto y una explicación de una o dos frases.
+2. Escribir para cada uno un nombre corto (máximo cuatro palabras) y una
+   explicación de una o dos frases.
 
-Sé concreto y honesto: si un conjunto funciona por el contraste de texturas,
-dilo; no escribas elogios genéricos. Nunca inventes prendas que no estén en la
-lista. Devuelve todos los conjuntos que recibas, ninguno menos.`;
+Sé concreta y honesta: si algo no pega, dilo, con cariño pero dilo. Nunca
+inventes prendas que no estén en la lista. Devuelve todos los conjuntos que
+recibas, ninguno menos.`;
 
 /**
  * Devuelve los conjuntos reordenados y con textos del modelo.
