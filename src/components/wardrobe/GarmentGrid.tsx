@@ -8,6 +8,10 @@ export interface GarmentGridProps {
   selectedIds?: string[];
   loading?: boolean;
   emptyMessage?: string;
+  /** Qué tarjetas llevan el recorte de esquina del diseño, por posición. */
+  adornos?: Partial<Record<number, "a" | "c">>;
+  /** El selector de prenda del probador marca la elegida con un lacre. */
+  mostrarSelloSeleccion?: boolean;
 }
 
 const SKELETON_COUNT = 8;
@@ -19,6 +23,8 @@ export function GarmentGrid({
   selectedIds,
   loading = false,
   emptyMessage = "Todavía no hay prendas aquí.",
+  adornos,
+  mostrarSelloSeleccion = false,
 }: GarmentGridProps) {
   if (loading) {
     return (
@@ -36,12 +42,14 @@ export function GarmentGrid({
 
   return (
     <div className={GRID_CLASSES}>
-      {garments.map((garment) => (
+      {garments.map((garment, index) => (
         <GarmentCard
           key={garment.id}
           garment={garment}
           onClick={onSelect}
           selected={selectedIds?.includes(garment.id) ?? false}
+          {...(adornos?.[index] ? { adorno: adornos[index] } : {})}
+          sello={mostrarSelloSeleccion}
         />
       ))}
     </div>

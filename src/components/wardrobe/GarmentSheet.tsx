@@ -102,14 +102,17 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
             />
           </div>
 
-          <div>
-            <h2 className="titulo text-2xl">{garment.subcategory}</h2>
-            <p className="mt-0.5 text-xs font-medium text-neutral-500">
-              Añadida el {new Date(garment.createdAt).toLocaleDateString("es-ES", {
-                day: "numeric",
-                month: "long",
-              })}
-            </p>
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <h2 className="titulo text-2xl">{garment.subcategory}</h2>
+              <p className="mt-0.5 text-xs font-medium text-neutral-500">
+                Añadida el {new Date(garment.createdAt).toLocaleDateString("es-ES", {
+                  day: "numeric",
+                  month: "long",
+                })}
+              </p>
+            </div>
+            <div aria-hidden="true" className="adorno-ficha" />
           </div>
 
           {/* Las etiquetas van por familias de color, como en el diseño. */}

@@ -8,17 +8,30 @@ import Link from "next/link";
  * del probador). El icono de ajustes va siempre: es la única entrada a esa
  * pantalla.
  */
+const ADORNOS = {
+  armario: "adorno-cabecera-armario",
+  subir: "adorno-cabecera-subir",
+  etiquetas: "adorno-cabecera-etiquetas",
+  probador: "adorno-cabecera-probador",
+  mismatch: "adorno-cabecera-mismatch",
+  conjuntos: "adorno-cabecera-conjuntos",
+  favoritos: "adorno-cabecera-favoritos",
+} as const;
+
 export function Cabecera({
   titulo,
   subtitulo,
   accion,
   contador,
+  adorno,
 }: {
   titulo: string;
   subtitulo?: string;
   accion?: ReactNode;
   /** Píldora opcional a la derecha del título (p. ej. "12 prendas"). */
   contador?: string;
+  /** El recorte de esquina del diseño para esta pantalla, si tiene uno. */
+  adorno?: keyof typeof ADORNOS;
 }) {
   return (
     <header className="relative z-[3] -mx-4 bg-surface">
@@ -60,6 +73,7 @@ export function Cabecera({
         </div>
       </div>
       <div className="cinta-encaje" />
+      {adorno !== undefined && <div aria-hidden="true" className={ADORNOS[adorno]} />}
     </header>
   );
 }

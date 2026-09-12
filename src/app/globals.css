@@ -132,6 +132,84 @@
   --encaje-cabecera-alto: 22px;
   --encaje-tarjeta: url("/decor/lb-pinkbows.png");
   --volante-menu: url("/decor/lb-pinkruffle.png");
+
+  /*
+   * Adornos de esquina y de acompañamiento del diseño: una imagen y una
+   * posición por hueco fijo, igual que el encaje. El hueco no cambia entre
+   * temas, el token sí. Los que Coquette esconde (--*-display) es porque el
+   * diseño los deja fuera en esa vista, no un olvido.
+   */
+  --ad-armario-img: url("/decor/fairy-butterfly.png");
+  --ad-armario-w: 46px;
+  --ad-armario-right: 16px;
+  --ad-armario-bottom: -12px;
+  --ad-armario-ratio: 236 / 240;
+
+  --ad-tarjeta-a-img: url("/decor/fairy-heart-plaid.png");
+  --ad-tarjeta-a-w: 46px;
+  --ad-tarjeta-a-ratio: 236 / 240;
+
+  --ad-tarjeta-c-img: url("/decor/fairy-butterfly-green.png");
+  --ad-tarjeta-c-w: 34px;
+  --ad-tarjeta-c-ratio: 236 / 240;
+
+  --ad-ficha-img: url("/decor/seal-leaf.png");
+
+  --ad-subir-img: url("/decor/fairy-flower-1.png");
+  --ad-subir-w: 46px;
+  --ad-subir-right: 14px;
+  --ad-subir-bottom: -14px;
+  --ad-subir-display: block;
+
+  --ad-hero-img: url("/decor/fairy-lily-cream.png");
+  --ad-hero-ratio: 236 / 240;
+
+  --ad-etiquetas-img: url("/decor/fairy-flower-3.png");
+  --ad-etiquetas-w: 46px;
+  --ad-etiquetas-right: 16px;
+  --ad-etiquetas-bottom: -10px;
+  --ad-etiquetas-ratio: 236 / 240;
+
+  --ad-probador-img: url("/decor/fairy-daylily.png");
+  --ad-probador-w: 46px;
+  --ad-probador-left: 12px;
+  --ad-probador-bottom: -18px;
+  --ad-probador-display: block;
+
+  --ad-combina-a-img: url("/decor/fairy-orchid-green.png");
+  --ad-combina-a-w: 50px;
+  --ad-combina-a-ratio: 236 / 240;
+
+  --ad-combina-b-img: url("/decor/stamp-swan.png");
+  --ad-combina-b-w: 48px;
+
+  --ad-mismatch-img: url("/decor/fairy-mushroom.png");
+  --ad-mismatch-w: 46px;
+  --ad-mismatch-right: 18px;
+  --ad-mismatch-bottom: -12px;
+  --ad-mismatch-ratio: 236 / 240;
+
+  --ad-mismatch-icono-img: url("/decor/fairy-heart-plaid.png");
+  --ad-mismatch-icono-w: 46px;
+  --ad-mismatch-icono-ratio: 236 / 240;
+
+  --ad-conjuntos-img: url("/decor/fairy-bird.png");
+  --ad-conjuntos-w: 46px;
+  --ad-conjuntos-right: 14px;
+  --ad-conjuntos-bottom: -12px;
+  --ad-conjuntos-ratio: 236 / 240;
+
+  --ad-tarjeta-conjunto-img: url("/decor/fairy-heart-plaid.png");
+  --ad-tarjeta-conjunto-w: 46px;
+  --ad-tarjeta-conjunto-right: 16px;
+  --ad-tarjeta-conjunto-bottom: -10px;
+  --ad-tarjeta-conjunto-ratio: 236 / 240;
+
+  --ad-favoritos-img: url("/decor/fairy-daylily.png");
+  --ad-favoritos-w: 46px;
+  --ad-favoritos-left: 14px;
+  --ad-favoritos-bottom: -20px;
+  --ad-favoritos-display: block;
 }
 
 /* ---- Coquette (tema oscuro) ---- */
@@ -202,6 +280,70 @@
   --encaje-cabecera-alto: 26px;
   --encaje-tarjeta: url("/decor/lb-tulle.png");
   --volante-menu: url("/decor/lb-pinkruffle.png");
+
+  /*
+   * Adornos: Coquette cambia el motivo y, en las cabeceras, lo mueve de abajo
+   * a arriba (--*-bottom se apaga y --*-top toma el relevo). Tres pantallas
+   * (añadir, probador, favoritos) lo esconden del todo: así lo dejó el diseño.
+   */
+  --ad-armario-img: url("/decor/st-bow-polka.png");
+  --ad-armario-w: 62px;
+  --ad-armario-right: 5px;
+  --ad-armario-bottom: auto;
+  --ad-armario-top: -18px;
+  --ad-armario-ratio: 145 / 148;
+
+  --ad-tarjeta-a-img: url("/decor/st-heart-gingham.png");
+  --ad-tarjeta-a-ratio: 145 / 148;
+  --ad-tarjeta-c-img: url("/decor/st-charm.png");
+  --ad-tarjeta-c-w: 38px;
+  --ad-tarjeta-c-ratio: 145 / 148;
+
+  --ad-ficha-img: url("/decor/seal-bow.png");
+
+  --ad-subir-display: none;
+
+  --ad-hero-img: url("/decor/st-polaroid.png");
+  --ad-hero-ratio: 145 / 148;
+  --ad-etiquetas-img: url("/decor/st-hearts-dot.png");
+  --ad-etiquetas-w: 62px;
+  --ad-etiquetas-right: 11px;
+  --ad-etiquetas-bottom: auto;
+  --ad-etiquetas-top: 38px;
+  --ad-etiquetas-ratio: 145 / 148;
+
+  --ad-probador-display: none;
+
+  --ad-combina-a-img: url("/decor/st-ticket.png");
+  --ad-combina-a-w: 52px;
+  --ad-combina-a-ratio: 145 / 148;
+  --ad-combina-b-img: url("/decor/stamp-love.png");
+
+  --ad-mismatch-img: url("/decor/st-lock.png");
+  --ad-mismatch-w: 62px;
+  --ad-mismatch-right: 11px;
+  --ad-mismatch-bottom: auto;
+  --ad-mismatch-top: 17px;
+  --ad-mismatch-ratio: 145 / 148;
+
+  --ad-mismatch-icono-img: url("/decor/st-heart-gingham.png");
+  --ad-mismatch-icono-ratio: 145 / 148;
+
+  --ad-conjuntos-img: url("/decor/st-film.png");
+  --ad-conjuntos-w: 62px;
+  --ad-conjuntos-right: 19px;
+  --ad-conjuntos-bottom: auto;
+  --ad-conjuntos-top: 19px;
+  --ad-conjuntos-ratio: 145 / 148;
+
+  --ad-tarjeta-conjunto-img: url("/decor/st-heart-gingham.png");
+  --ad-tarjeta-conjunto-w: 62px;
+  --ad-tarjeta-conjunto-right: 6px;
+  --ad-tarjeta-conjunto-bottom: auto;
+  --ad-tarjeta-conjunto-top: 7px;
+  --ad-tarjeta-conjunto-ratio: 145 / 148;
+
+  --ad-favoritos-display: none;
 }
 
 /*
@@ -274,6 +416,65 @@
     --encaje-cabecera-alto: 26px;
     --encaje-tarjeta: url("/decor/lb-tulle.png");
     --volante-menu: url("/decor/lb-pinkruffle.png");
+
+    --ad-armario-img: url("/decor/st-bow-polka.png");
+    --ad-armario-w: 62px;
+    --ad-armario-right: 5px;
+    --ad-armario-bottom: auto;
+    --ad-armario-top: -18px;
+    --ad-armario-ratio: 145 / 148;
+
+    --ad-tarjeta-a-img: url("/decor/st-heart-gingham.png");
+    --ad-tarjeta-a-ratio: 145 / 148;
+    --ad-tarjeta-c-img: url("/decor/st-charm.png");
+    --ad-tarjeta-c-w: 38px;
+    --ad-tarjeta-c-ratio: 145 / 148;
+
+    --ad-ficha-img: url("/decor/seal-bow.png");
+
+    --ad-subir-display: none;
+
+    --ad-hero-img: url("/decor/st-polaroid.png");
+    --ad-hero-ratio: 145 / 148;
+    --ad-etiquetas-img: url("/decor/st-hearts-dot.png");
+    --ad-etiquetas-w: 62px;
+    --ad-etiquetas-right: 11px;
+    --ad-etiquetas-bottom: auto;
+    --ad-etiquetas-top: 38px;
+    --ad-etiquetas-ratio: 145 / 148;
+
+    --ad-probador-display: none;
+
+    --ad-combina-a-img: url("/decor/st-ticket.png");
+    --ad-combina-a-w: 52px;
+    --ad-combina-a-ratio: 145 / 148;
+    --ad-combina-b-img: url("/decor/stamp-love.png");
+
+    --ad-mismatch-img: url("/decor/st-lock.png");
+    --ad-mismatch-w: 62px;
+    --ad-mismatch-right: 11px;
+    --ad-mismatch-bottom: auto;
+    --ad-mismatch-top: 17px;
+    --ad-mismatch-ratio: 145 / 148;
+
+    --ad-mismatch-icono-img: url("/decor/st-heart-gingham.png");
+    --ad-mismatch-icono-ratio: 145 / 148;
+
+    --ad-conjuntos-img: url("/decor/st-film.png");
+    --ad-conjuntos-w: 62px;
+    --ad-conjuntos-right: 19px;
+    --ad-conjuntos-bottom: auto;
+    --ad-conjuntos-top: 19px;
+    --ad-conjuntos-ratio: 145 / 148;
+
+    --ad-tarjeta-conjunto-img: url("/decor/st-heart-gingham.png");
+    --ad-tarjeta-conjunto-w: 62px;
+    --ad-tarjeta-conjunto-right: 6px;
+    --ad-tarjeta-conjunto-bottom: auto;
+    --ad-tarjeta-conjunto-top: 7px;
+    --ad-tarjeta-conjunto-ratio: 145 / 148;
+
+    --ad-favoritos-display: none;
   }
 }
 
@@ -340,6 +541,252 @@ body {
   background-position: center;
   background-size: auto 100%;
   transform: scaleY(-1);
+}
+
+/*
+ * Adornos de esquina: mariposas, flores y lacres pegados en la cabecera y en
+ * alguna tarjeta, siempre en una esquina y nunca sobre texto. `pointer-events:
+ * none` porque son decoración, no deben robarle el toque a lo de debajo.
+ */
+.adorno-cabecera-armario {
+  position: absolute;
+  right: var(--ad-armario-right);
+  bottom: var(--ad-armario-bottom, auto);
+  top: var(--ad-armario-top, auto);
+  height: var(--ad-armario-w);
+  width: auto;
+  aspect-ratio: var(--ad-armario-ratio);
+  background-image: var(--ad-armario-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-tarjeta-a {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: var(--ad-tarjeta-a-w);
+  height: auto;
+  aspect-ratio: var(--ad-tarjeta-a-ratio);
+  background-image: var(--ad-tarjeta-a-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-tarjeta-c {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: var(--ad-tarjeta-c-w);
+  height: auto;
+  aspect-ratio: var(--ad-tarjeta-c-ratio);
+  background-image: var(--ad-tarjeta-c-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-ficha {
+  flex: none;
+  width: 38px;
+  height: auto;
+  aspect-ratio: 141 / 144;
+  background-image: var(--ad-ficha-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-cabecera-subir {
+  display: var(--ad-subir-display);
+  position: absolute;
+  right: var(--ad-subir-right);
+  bottom: var(--ad-subir-bottom);
+  height: var(--ad-subir-w);
+  width: auto;
+  aspect-ratio: 236 / 240;
+  background-image: var(--ad-subir-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-hero {
+  flex: none;
+  width: 96px;
+  height: auto;
+  aspect-ratio: var(--ad-hero-ratio);
+  background-image: var(--ad-hero-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-cabecera-etiquetas {
+  position: absolute;
+  right: var(--ad-etiquetas-right);
+  bottom: var(--ad-etiquetas-bottom, auto);
+  top: var(--ad-etiquetas-top, auto);
+  height: var(--ad-etiquetas-w);
+  width: auto;
+  aspect-ratio: var(--ad-etiquetas-ratio);
+  background-image: var(--ad-etiquetas-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-ficha-sello {
+  flex: none;
+  width: 38px;
+  height: auto;
+  aspect-ratio: 141 / 144;
+  background-image: url("/decor/seal-heart.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-cabecera-probador {
+  display: var(--ad-probador-display);
+  position: absolute;
+  left: var(--ad-probador-left);
+  bottom: var(--ad-probador-bottom);
+  height: var(--ad-probador-w);
+  width: auto;
+  aspect-ratio: 236 / 240;
+  background-image: var(--ad-probador-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-combina-a {
+  flex: none;
+  width: var(--ad-combina-a-w);
+  height: auto;
+  aspect-ratio: var(--ad-combina-a-ratio);
+  background-image: var(--ad-combina-a-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-combina-b {
+  flex: none;
+  width: var(--ad-combina-b-w);
+  height: auto;
+  aspect-ratio: 177 / 157;
+  background-image: var(--ad-combina-b-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-chip-cher {
+  flex: none;
+  width: 34px;
+  height: auto;
+  aspect-ratio: 236 / 240;
+  background-image: url("/decor/fairy-bird.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-cabecera-mismatch {
+  position: absolute;
+  right: var(--ad-mismatch-right);
+  bottom: var(--ad-mismatch-bottom, auto);
+  top: var(--ad-mismatch-top, auto);
+  height: var(--ad-mismatch-w);
+  width: auto;
+  aspect-ratio: var(--ad-mismatch-ratio);
+  background-image: var(--ad-mismatch-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-mismatch-icono {
+  flex: none;
+  width: var(--ad-mismatch-icono-w);
+  height: auto;
+  aspect-ratio: var(--ad-mismatch-icono-ratio);
+  background-image: var(--ad-mismatch-icono-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-sello-elegir {
+  position: absolute;
+  right: -8px;
+  top: -10px;
+  width: 40px;
+  height: auto;
+  aspect-ratio: 141 / 144;
+  background-image: url("/decor/seal-rose.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-cabecera-conjuntos {
+  position: absolute;
+  right: var(--ad-conjuntos-right);
+  bottom: var(--ad-conjuntos-bottom, auto);
+  top: var(--ad-conjuntos-top, auto);
+  height: var(--ad-conjuntos-w);
+  width: auto;
+  aspect-ratio: var(--ad-conjuntos-ratio);
+  background-image: var(--ad-conjuntos-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-cabecera-tarjeta-conjunto {
+  position: absolute;
+  right: var(--ad-tarjeta-conjunto-right);
+  bottom: var(--ad-tarjeta-conjunto-bottom, auto);
+  top: var(--ad-tarjeta-conjunto-top, auto);
+  height: var(--ad-tarjeta-conjunto-w);
+  width: auto;
+  aspect-ratio: var(--ad-tarjeta-conjunto-ratio);
+  background-image: var(--ad-tarjeta-conjunto-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-cabecera-favoritos {
+  display: var(--ad-favoritos-display);
+  position: absolute;
+  left: var(--ad-favoritos-left);
+  bottom: var(--ad-favoritos-bottom);
+  height: var(--ad-favoritos-w);
+  width: auto;
+  aspect-ratio: 236 / 240;
+  background-image: var(--ad-favoritos-img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.adorno-conjunto-a {
+  flex: none;
+  width: 38px;
+  height: auto;
+  aspect-ratio: 177 / 157;
+  background-image: url("/decor/stamp-blossom.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.adorno-conjunto-b {
+  flex: none;
+  width: 38px;
+  height: auto;
+  aspect-ratio: 177 / 157;
+  background-image: url("/decor/stamp-cat.png");
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 /* Fondo a cuadros de transparencia, para previsualizar recortes sin fondo. */

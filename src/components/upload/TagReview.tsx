@@ -122,9 +122,12 @@ export function TagReview({ attributes, imageUrl, onConfirm, onCancel, saving = 
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div className="checkerboard mx-auto flex h-64 w-64 max-w-full items-center justify-center overflow-hidden rounded-[28px] shadow-[var(--sombra-tarjeta)]">
-        {/* eslint-disable-next-line @next/next/no-img-element -- imagen local aún sin subir, no cabe en el loader de next/image */}
-        <img src={imageUrl} alt="Recorte de la prenda" className="h-full w-full object-contain" />
+      <div className="relative mx-auto h-64 w-64 max-w-full">
+        <div className="checkerboard flex h-full w-full items-center justify-center overflow-hidden rounded-[28px] shadow-[var(--sombra-tarjeta)]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- imagen local aún sin subir, no cabe en el loader de next/image */}
+          <img src={imageUrl} alt="Recorte de la prenda" className="h-full w-full object-contain" />
+        </div>
+        <div aria-hidden="true" className="adorno-ficha-sello absolute -right-2 -top-2" />
       </div>
 
       <section className="flex flex-col gap-2">

@@ -10,11 +10,19 @@ export interface OutfitDeckProps {
   onToggleFavorite?: (outfit: Outfit) => void;
   onWear?: (outfit: Outfit) => void;
   loading?: boolean;
+  /** Favoritos lleva el sello del diseño en cada tarjeta; Conjuntos no. */
+  mostrarSello?: boolean;
 }
 
 const CARD_GAP_PX = 16;
 
-export function OutfitDeck({ outfits, onToggleFavorite, onWear, loading = false }: OutfitDeckProps) {
+export function OutfitDeck({
+  outfits,
+  onToggleFavorite,
+  onWear,
+  loading = false,
+  mostrarSello = false,
+}: OutfitDeckProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -49,9 +57,14 @@ export function OutfitDeck({ outfits, onToggleFavorite, onWear, loading = false 
         onScroll={handleScroll}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:grid lg:snap-none lg:grid-cols-1 lg:overflow-visible"
       >
-        {outfits.map((outfit) => (
+        {outfits.map((outfit, index) => (
           <div key={outfit.id} className="w-[88vw] max-w-sm shrink-0 snap-center lg:w-full lg:max-w-none">
-            <OutfitCard outfit={outfit} onToggleFavorite={onToggleFavorite} onWear={onWear} />
+            <OutfitCard
+              outfit={outfit}
+              onToggleFavorite={onToggleFavorite}
+              onWear={onWear}
+              {...(mostrarSello ? { sello: index % 2 === 0 ? "a" : "b" } : {})}
+            />
           </div>
         ))}
       </div>

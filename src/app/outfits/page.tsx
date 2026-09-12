@@ -74,7 +74,11 @@ export default function OutfitsPage() {
 
   return (
     <div className="space-y-6">
-      <Cabecera titulo="Conjuntos" subtitulo="Combinaciones hechas con lo que ya tienes." />
+      <Cabecera
+        adorno="conjuntos"
+        titulo="Conjuntos"
+        subtitulo="Combinaciones hechas con lo que ya tienes."
+      />
 
       <section className="space-y-4 rounded-[28px] bg-surface p-4 shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
         <fieldset>

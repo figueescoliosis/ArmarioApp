@@ -44,7 +44,7 @@ export default function FavoritosPage() {
 
   return (
     <div className="space-y-6">
-      <Cabecera titulo="Favoritos" subtitulo="Los conjuntos que has guardado." />
+      <Cabecera adorno="favoritos" titulo="Favoritos" subtitulo="Los conjuntos que has guardado." />
 
       {error !== null && (
         <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
@@ -61,6 +61,7 @@ export default function FavoritosPage() {
         <OutfitDeck
           outfits={outfits}
           loading={loading}
+          mostrarSello
           onToggleFavorite={(outfit) => void unfavorite(outfit)}
           onWear={(outfit) => {
             void Promise.allSettled(outfit.items.map((item) => logWear(item.garment.id)));

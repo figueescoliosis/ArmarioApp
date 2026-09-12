@@ -5,9 +5,19 @@ export interface GarmentCardProps {
   garment: Garment;
   onClick?: (garment: Garment) => void;
   selected?: boolean;
+  /** El recorte de esquina del diseño, en las pocas tarjetas que lo llevan. */
+  adorno?: "a" | "c";
+  /** El lacre de "elegida" del selector de prenda del probador. */
+  sello?: boolean;
 }
 
-export function GarmentCard({ garment, onClick, selected = false }: GarmentCardProps) {
+export function GarmentCard({
+  garment,
+  onClick,
+  selected = false,
+  adorno,
+  sello = false,
+}: GarmentCardProps) {
   const imageSrc = garment.thumbUrl ?? garment.cutoutUrl;
   // Un velo del color de la prenda sobre rosa muy claro: da un fondo distinto a
   // cada tarjeta sin llegar a oscurecerlo, que es lo que haría desaparecer los
@@ -47,21 +57,34 @@ export function GarmentCard({ garment, onClick, selected = false }: GarmentCardP
         </div>
       </div>
       <div className="cinta-encaje-tarjeta mx-[-9px]" />
+      {adorno !== undefined && <div aria-hidden="true" className={`adorno-tarjeta-${adorno}`} />}
     </>
   );
 
+  // El lacre de "elegida" se pega en la esquina de fuera, así que necesita un
+  // envoltorio sin recortar: la tarjeta en sí sí recorta, para las esquinas.
+  const sombrero = sello && selected && <div aria-hidden="true" className="adorno-sello-elegir" />;
+
   if (onClick) {
     return (
-      <button
-        type="button"
-        aria-pressed={selected}
-        onClick={() => onClick(garment)}
-        className={`${cardClass} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500`}
-      >
-        {body}
-      </button>
+      <div className="relative">
+        <button
+          type="button"
+          aria-pressed={selected}
+          onClick={() => onClick(garment)}
+          className={`${cardClass} w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500`}
+        >
+          {body}
+        </button>
+        {sombrero}
+      </div>
     );
   }
 
-  return <div className={cardClass}>{body}</div>;
+  return (
+    <div className="relative">
+      <div className={cardClass}>{body}</div>
+      {sombrero}
+    </div>
+  );
 }

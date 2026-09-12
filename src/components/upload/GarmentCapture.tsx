@@ -103,7 +103,7 @@ export function GarmentCapture({ onSelected, disabled = false }: GarmentCaptureP
           dragActive ? "border-clay-500 bg-clay-100" : "border-clay-300 bg-clay-50"
         }`}
       >
-        <GalleryIcon />
+        <div aria-hidden="true" className="adorno-hero" />
         <span className="text-sm font-bold text-clay-700">Arrastra una foto aquí</span>
         <span className="text-xs font-medium text-ink-soft">o elige de la galería</span>
       </button>
@@ -122,16 +122,6 @@ function CameraIcon() {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
       <circle cx="12" cy="13.5" r="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function GalleryIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" className="text-clay-700">
-      <rect x="3" y="4" width="18" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="m4 17 4.5-5 3.5 3.5L16 11l4 6" />
-      <circle cx="8" cy="9" r="1.4" />
     </svg>
   );
 }

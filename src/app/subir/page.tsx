@@ -79,8 +79,13 @@ export default function SubirPage() {
   return (
     <div className="space-y-6">
       <Cabecera
-        titulo="Añadir prenda"
-        subtitulo="Hazle una foto sobre un fondo liso. Del recorte y las etiquetas se encarga la app."
+        adorno={step.name === "review" ? "etiquetas" : "subir"}
+        titulo={step.name === "review" ? "Revisar etiquetas" : "Añadir prenda"}
+        subtitulo={
+          step.name === "review"
+            ? "Corrige lo que haga falta antes de guardar"
+            : "Hazle una foto sobre un fondo liso. Del recorte y las etiquetas se encarga la app."
+        }
       />
 
       {error !== null && <ErrorNotice error={error} onDismiss={() => setError(null)} />}

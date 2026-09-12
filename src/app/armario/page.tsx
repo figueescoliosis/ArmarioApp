@@ -59,6 +59,7 @@ export default function ArmarioPage() {
   return (
     <div className="space-y-6">
       <Cabecera
+        adorno="armario"
         titulo={showArchived ? "Archivadas" : "Mi armario"}
         subtitulo={
           loading
@@ -106,6 +107,7 @@ export default function ArmarioPage() {
         garments={visible}
         loading={loading}
         onSelect={setDetail}
+        adornos={{ 0: "a", 2: "c" }}
         emptyMessage={
           showArchived
             ? "Aquí aparecen las prendas que archives."

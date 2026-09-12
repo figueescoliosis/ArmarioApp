@@ -142,7 +142,10 @@ export default function ProbadorPage() {
 
   return (
     <div className="space-y-4">
-      <Header {...(items.length > 0 ? { onVaciar: () => setLook({}) } : {})} />
+      <Header
+        mismatch={graves.length > 0}
+        {...(items.length > 0 ? { onVaciar: () => setLook({}) } : {})}
+      />
 
       {error !== null && (
         <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
@@ -157,13 +160,15 @@ export default function ProbadorPage() {
             cuando el usuario va a tocar el siguiente.
             Con un desajuste grave el porcentaje no significa nada — el motor ni
             siquiera propondría ese conjunto — así que manda la alerta, no el número. */}
-        <div className="w-[100px] shrink-0">
+        <div className="flex w-[100px] shrink-0 flex-col items-center gap-2.5">
           {enoughPieces && graves.length === 0 && (
             <ScoreRing
               percent={Math.round(evaluation.score * 100)}
               tone={leves.length > 0 ? "aviso" : "bien"}
             />
           )}
+          <div aria-hidden="true" className="adorno-combina-a" />
+          <div aria-hidden="true" className="adorno-combina-b" />
         </div>
       </section>
 
@@ -211,6 +216,7 @@ export default function ProbadorPage() {
             })
           }
         >
+          <div aria-hidden="true" className="adorno-chip-cher" />
           {busy === "critica" ? "Preguntando…" : "¿Qué opina Mocha?"}
         </Button>
 
@@ -277,6 +283,7 @@ export default function ProbadorPage() {
                 garments={garments.filter((garment) => garment.category === picking)}
                 onSelect={(garment) => choose(picking, garment)}
                 selectedIds={[look[picking]?.id ?? ""]}
+                mostrarSelloSeleccion
                 emptyMessage="No tienes nada en esta categoría todavía."
               />
             </div>
@@ -287,11 +294,12 @@ export default function ProbadorPage() {
   );
 }
 
-function Header({ onVaciar }: { onVaciar?: () => void }) {
+function Header({ onVaciar, mismatch = false }: { onVaciar?: () => void; mismatch?: boolean }) {
   return (
     <Cabecera
+      adorno={mismatch ? "mismatch" : "probador"}
       titulo="Probador"
-      subtitulo="Toca un hueco para elegir prenda"
+      subtitulo={mismatch ? "Revisa lo que no encaja" : "Toca un hueco para elegir prenda"}
       accion={
         onVaciar && (
           <button
@@ -341,7 +349,11 @@ function Alerta({
         mal ? "border-red-200 bg-red-50" : "border-amber-200 bg-amber-50"
       }`}
     >
-      <Lazo size={22} tone={mal ? "triste" : "rosa"} className="mt-1 flex-none" />
+      {mal ? (
+        <div aria-hidden="true" className="adorno-mismatch-icono mt-1" />
+      ) : (
+        <Lazo size={22} tone="rosa" className="mt-1 flex-none" />
+      )}
       <div className="flex-1">
         <p className={`titulo text-xl ${mal ? "text-red-700" : "text-amber-900"}`}>{titulo}</p>
         <p className="mt-0.5 text-xs font-medium text-neutral-500">{subtitulo}</p>

@@ -10,6 +10,8 @@ export interface OutfitCardProps {
   outfit: Outfit;
   onToggleFavorite?: (outfit: Outfit) => void;
   onWear?: (outfit: Outfit) => void;
+  /** El sello de la lista de favoritos del diseño, alternado por tarjeta. */
+  sello?: "a" | "b";
 }
 
 /**
@@ -37,14 +39,19 @@ const BREAKDOWN_KEYS: Array<keyof ScoreBreakdown> = [
   "freshness",
 ];
 
-export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps) {
+export function OutfitCard({ outfit, onToggleFavorite, onWear, sello }: OutfitCardProps) {
   const [expanded, setExpanded] = useState(false);
   const percent = Math.round(outfit.score * 100);
 
   return (
     <article className="flex flex-col gap-2.5">
       <div className="rounded-[28px] bg-surface p-[13px] shadow-[var(--sombra-tarjeta)]">
-        {outfit.name !== null && <h3 className="titulo mb-2 px-1 text-[38px]">{outfit.name}</h3>}
+        {outfit.name !== null && (
+          <div className="relative mb-2 px-1">
+            <h3 className="titulo text-[38px]">{outfit.name}</h3>
+            <div aria-hidden="true" className="adorno-cabecera-tarjeta-conjunto" />
+          </div>
+        )}
 
         <div className="flex items-start gap-3">
           <MannequinGrid items={outfit.items} compacta />
@@ -60,6 +67,9 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear }: OutfitCardProps
             >
               <HeartIcon filled={outfit.isFavorite} />
             </button>
+            {sello !== undefined && (
+              <div aria-hidden="true" className={`adorno-conjunto-${sello}`} />
+            )}
           </div>
         </div>
 
