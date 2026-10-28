@@ -225,6 +225,7 @@ export interface ApiError {
 
 export type ApiErrorCode =
   | "BAD_REQUEST"
+  | "UNAUTHORIZED"
   | "NOT_FOUND"
   | "MISSING_CONFIG"
   | "IMAGE_TOO_LARGE"

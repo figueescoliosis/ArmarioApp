@@ -28,6 +28,8 @@ function statusFor(code: ApiErrorCode): number {
   switch (code) {
     case "BAD_REQUEST":
       return 400;
+    case "UNAUTHORIZED":
+      return 401;
     case "NOT_FOUND":
       return 404;
     case "UNSUPPORTED_MEDIA_TYPE":

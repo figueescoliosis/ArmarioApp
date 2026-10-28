@@ -55,5 +55,7 @@ function timingSafeEqual(a: string, b: string): boolean {
 export const config = {
   // Todo menos los estáticos de Next y el favicon: no hace falta autenticar un
   // fichero de JavaScript, y pedirlo rompe la carga de la página del 401.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // `api/cron` tampoco: Vercel Cron no manda Basic Auth y esa ruta comprueba
+  // `CRON_SECRET` por su cuenta.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/cron/).*)"],
 };
