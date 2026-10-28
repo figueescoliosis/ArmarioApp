@@ -11,10 +11,12 @@ const MAX_BYTES = 15 * 1024 * 1024;
 
 export interface GarmentCaptureProps {
   onSelected: (image: PreparedImage) => void;
+  /** Con varias fotos a la vez se salta el encuadre y van todas a la cola. */
+  onSelectedMany?: (files: File[]) => void;
   disabled?: boolean;
 }
 
-export function GarmentCapture({ onSelected, disabled = false }: GarmentCaptureProps) {
+export function GarmentCapture({ onSelected, onSelectedMany, disabled = false }: GarmentCaptureProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
@@ -50,13 +52,25 @@ export function GarmentCapture({ onSelected, disabled = false }: GarmentCaptureP
     [busy, onSelected],
   );
 
+  const processFiles = useCallback(
+    (list: FileList | null | undefined) => {
+      const files = Array.from(list ?? []);
+      if (files.length > 1 && onSelectedMany !== undefined && !busy) {
+        onSelectedMany(files);
+        return;
+      }
+      void processFile(files[0]);
+    },
+    [busy, onSelectedMany, processFile],
+  );
+
   const handleDrop = useCallback(
     (event: DragEvent<HTMLButtonElement>) => {
       event.preventDefault();
       setDragActive(false);
-      void processFile(event.dataTransfer.files[0]);
+      processFiles(event.dataTransfer.files);
     },
-    [processFile],
+    [processFiles],
   );
 
   return (
@@ -74,8 +88,9 @@ export function GarmentCapture({ onSelected, disabled = false }: GarmentCaptureP
         ref={galleryInputRef}
         type="file"
         accept="image/*"
+        multiple={onSelectedMany !== undefined}
         hidden
-        onChange={(event) => void processFile(event.target.files?.[0])}
+        onChange={(event) => processFiles(event.target.files)}
       />
 
       <Button
@@ -104,7 +119,9 @@ export function GarmentCapture({ onSelected, disabled = false }: GarmentCaptureP
         }`}
       >
         <div aria-hidden="true" className="adorno-hero" />
-        <span className="text-sm font-bold text-clay-700">Arrastra una foto aquí</span>
+        <span className="text-sm font-bold text-clay-700">
+          {onSelectedMany !== undefined ? "Arrastra una o varias fotos aquí" : "Arrastra una foto aquí"}
+        </span>
         <span className="text-xs font-medium text-ink-soft">o elige de la galería</span>
       </button>
 

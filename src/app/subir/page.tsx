@@ -2,7 +2,7 @@
 
 /**
  * Alta de una prenda, en cuatro estados: capturar → encuadrar → analizar →
- * revisar y guardar.
+ * revisar y guardar. Con varias fotos a la vez, `BatchUpload` lleva la cola.
  *
  * La revisión de etiquetas antes de guardar no es un adorno: el modelo acierta
  * mucho pero no siempre, y una prenda mal categorizada envenena todos los
@@ -12,6 +12,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { BatchUpload } from "@/components/upload/BatchUpload";
 import { GarmentCapture } from "@/components/upload/GarmentCapture";
 import { ImageCropper } from "@/components/upload/ImageCropper";
 import { TagReview } from "@/components/upload/TagReview";
@@ -26,7 +27,8 @@ type Step =
   | { name: "capture" }
   | { name: "crop"; image: PreparedImage }
   | { name: "analyzing" }
-  | { name: "review"; analysis: AnalyzeGarmentResult };
+  | { name: "review"; analysis: AnalyzeGarmentResult }
+  | { name: "batch"; files: File[] };
 
 export default function SubirPage() {
   const router = useRouter();
@@ -80,7 +82,13 @@ export default function SubirPage() {
     <div className="space-y-6">
       <Cabecera
         adorno={step.name === "review" ? "etiquetas" : "subir"}
-        titulo={step.name === "review" ? "Revisar etiquetas" : "Añadir prenda"}
+        titulo={
+          step.name === "review"
+            ? "Revisar etiquetas"
+            : step.name === "batch"
+              ? `Añadir ${step.files.length} prendas`
+              : "Añadir prenda"
+        }
         subtitulo={
           step.name === "review"
             ? "Corrige lo que haga falta antes de guardar"
@@ -91,7 +99,21 @@ export default function SubirPage() {
       {error !== null && <ErrorNotice error={error} onDismiss={() => setError(null)} />}
 
       {step.name === "capture" && (
-        <GarmentCapture onSelected={(image) => setStep({ name: "crop", image })} />
+        <GarmentCapture
+          onSelected={(image) => setStep({ name: "crop", image })}
+          onSelectedMany={(files) => setStep({ name: "batch", files })}
+        />
+      )}
+
+      {step.name === "batch" && (
+        <BatchUpload
+          files={step.files}
+          onDone={() => {
+            router.push("/armario");
+            router.refresh();
+          }}
+          onCancel={() => setStep({ name: "capture" })}
+        />
       )}
 
       {step.name === "crop" && (

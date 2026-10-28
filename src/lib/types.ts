@@ -211,8 +211,41 @@ export interface CoupleOutfit {
   theirs: Outfit;
   /** Puntuación del par 0-1: lo bueno de cada look más lo bien que combinan. */
   score: number;
-  /** Lo que tienen los dos looks en común, redactado por reglas. */
+  /** Nombre del par si lo redactó el modelo; `null` con las reglas. */
+  name: string | null;
+  /** Lo que tienen los dos looks en común, redactado por reglas o por el modelo. */
   rationale: string;
+  /** Guardado como favorito. Lo ven los dos. */
+  isFavorite: boolean;
+}
+
+/** Un conjunto o un par apuntado para un día. Lo ven los dos. */
+export interface Plan {
+  id: string;
+  /** `yyyy-mm-dd`. */
+  day: string;
+  /** Quién lo apuntó: solo esa persona puede borrarlo. */
+  ownerId: string;
+  /** Exactamente uno de los dos. En un par, `mine` es siempre el de quien mira. */
+  outfit: Outfit | null;
+  couple: CoupleOutfit | null;
+}
+
+/** El tiempo de un día en un sitio, listo para pasárselo al motor. */
+export interface DayWeather {
+  /** `yyyy-mm-dd`. */
+  day: string;
+  /** Sensación térmica media del día: es lo que se pasa como `temperatureC`. */
+  tempC: number;
+  minC: number;
+  maxC: number;
+  /** Probabilidad de lluvia 0-100; `null` cuando es una estimación. */
+  rainProbability: number | null;
+  season: Season;
+  /** Nombre del sitio, si se buscó por ciudad. */
+  place: string | null;
+  /** `true` si el día queda fuera de la previsión y se usa el del año pasado. */
+  estimated: boolean;
 }
 
 export interface OwnersInfo {
@@ -254,6 +287,7 @@ export type ApiErrorCode =
   | "TAGGING_FAILED"
   | "STORAGE_FAILED"
   | "DATABASE_FAILED"
+  | "WEATHER_FAILED"
   | "INTERNAL";
 
 export interface PipelineTimings {

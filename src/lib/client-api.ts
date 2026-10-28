@@ -15,12 +15,14 @@ import type {
   ApiResponse,
   CoupleOutfit,
   CreateGarmentResult,
+  DayWeather,
   Garment,
   GarmentAttributes,
   GarmentUpdate,
   Outfit,
   OutfitRequest,
   OwnersInfo,
+  Plan,
 } from "@/lib/types";
 
 /** Error de API con el código y, si aplica, la variable de entorno que falta. */
@@ -170,4 +172,63 @@ export async function removeFavorite(id: string): Promise<void> {
   await unwrap<{ id: string }>(
     await fetch(`/api/outfits/favorites?id=${encodeURIComponent(id)}`, { method: "DELETE" }),
   );
+}
+
+/* ────────────────────────────── Pareja ────────────────────────────── */
+
+export async function fetchCoupleFavorites(): Promise<CoupleOutfit[]> {
+  return unwrap<CoupleOutfit[]>(await fetch("/api/outfits/couple/favorites", { cache: "no-store" }));
+}
+
+export async function saveCoupleFavorite(pair: CoupleOutfit): Promise<CoupleOutfit> {
+  return unwrap<CoupleOutfit>(
+    await fetch("/api/outfits/couple/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(pair),
+    }),
+  );
+}
+
+export async function removeCoupleFavorite(id: string): Promise<void> {
+  await unwrap<{ id: string }>(
+    await fetch(`/api/outfits/couple/favorites?id=${encodeURIComponent(id)}`, { method: "DELETE" }),
+  );
+}
+
+/* ────────────────────────────── Tiempo y planes ────────────────────────────── */
+
+/** El tiempo de un día, por coordenadas del GPS o por ciudad. */
+export async function fetchWeather(
+  day: string,
+  where: { lat: number; lon: number } | { city: string },
+): Promise<DayWeather> {
+  const params = new URLSearchParams({ date: day });
+  if ("city" in where) params.set("city", where.city);
+  else {
+    params.set("lat", where.lat.toFixed(2));
+    params.set("lon", where.lon.toFixed(2));
+  }
+  return unwrap<DayWeather>(await fetch(`/api/weather?${params}`, { cache: "no-store" }));
+}
+
+export async function fetchPlans(): Promise<Plan[]> {
+  return unwrap<Plan[]>(await fetch("/api/plans", { cache: "no-store" }));
+}
+
+export async function addPlan(
+  day: string,
+  target: { outfit: Outfit } | { couple: CoupleOutfit },
+): Promise<Plan> {
+  return unwrap<Plan>(
+    await fetch("/api/plans", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ day, ...target }),
+    }),
+  );
+}
+
+export async function removePlan(id: string): Promise<void> {
+  await unwrap<{ id: string }>(await fetch(`/api/plans?id=${encodeURIComponent(id)}`, { method: "DELETE" }));
 }

@@ -2,8 +2,9 @@
  * Conjuntos de pareja: los mejores looks de cada armario, emparejados.
  *
  * Cada armario pasa por el generador con la misma petición (misma ocasión,
- * misma temperatura) y `pairOutfits` busca qué looks van bien juntos. Todo por
- * reglas: sin modelo, así que es rápido y no gasta cuota.
+ * misma temperatura) y `pairOutfits` busca qué looks van bien juntos, por
+ * reglas. Con `useLlmRanking` el modelo reordena y redacta el top 5 de pares,
+ * igual que en `/api/outfits/generate`, y si falla se quedan los de reglas.
  */
 
 import { NextRequest } from "next/server";
@@ -11,12 +12,15 @@ import { fail, handle, ok } from "@/lib/api";
 import { getLastWornMap, listGarments } from "@/lib/db/garments";
 import { currentOwnerId } from "@/lib/db/supabase";
 import { pairOutfits } from "@/lib/outfits/couple";
+import { explainCouples } from "@/lib/outfits/explain";
 import { generateOutfits } from "@/lib/outfits/generator";
 import { sanitizeRequest } from "@/lib/outfits/request";
 import { partnerOf } from "@/lib/owners";
 
 /** Looks de cada armario que entran al emparejado. */
 const CANDIDATES_PER_OWNER = 15;
+
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   return handle(async () => {
@@ -57,6 +61,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return ok(pairs);
+    return ok(outfitRequest.useLlmRanking ? await explainCouples(pairs) : pairs);
   });
 }

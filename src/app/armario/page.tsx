@@ -9,7 +9,7 @@ import { GarmentSheet } from "@/components/wardrobe/GarmentSheet";
 import { Button } from "@/components/ui/Button";
 import { Cabecera } from "@/components/ui/Cabecera";
 import { Chip } from "@/components/ui/Chip";
-import { deleteGarment, fetchGarments, fetchOwners, updateGarment } from "@/lib/client-api";
+import { deleteGarment, fetchGarments, fetchOwners, logWear, updateGarment } from "@/lib/client-api";
 import { CATEGORIES, type Category, type Garment, type OwnersInfo } from "@/lib/types";
 
 export default function ArmarioPage() {
@@ -159,6 +159,7 @@ export default function ArmarioPage() {
       <GarmentSheet
         garment={detail}
         onClose={() => setDetail(null)}
+        onWear={(garment) => logWear(garment.id)}
         {...(partnerView ? {} : { onArchive: archive, onDelete: remove })}
       />
     </div>

@@ -13,7 +13,7 @@ recoge lo que hace falta para *cambiar* el código sin romper nada.
 
 ```bash
 npm run dev        # desarrollo en http://localhost:3000
-npm run test       # Vitest, 130 tests, ninguno toca la red
+npm run test       # Vitest, 139 tests, ninguno toca la red
 npm run typecheck  # tsc --noEmit
 npm run lint       # ESLint
 npm run build      # build de producción (más estricto que typecheck, ver abajo)
@@ -124,21 +124,36 @@ externos.
 Conjuntos con los dos armarios, en `/outfits`: «Mezclar» pasa la unión de los
 dos armarios al generador (`mode: "mezcla"`); «A juego» genera el top de cada
 uno y los empareja con `src/lib/outfits/couple.ts` (`/api/outfits/couple`),
-puro y determinista como el generador.
+puro y determinista como el generador. Los pares favoritos
+(`couple_outfits`) los ven los dos: cada look se guarda en el armario de su
+dueño con `is_favorite = false` y el favorito es la fila del par.
+
+## Tiempo y calendario
+
+`src/lib/weather.ts` consulta Open-Meteo (sin clave) desde `/api/weather`: la
+previsión hasta 15 días vista y, más allá, el mismo día de un año pasado,
+marcado `estimated`. Devuelve una temperatura y una temporada (con el
+hemisferio sur invertido) que `/outfits` pasa al motor como si las hubiera
+elegido el usuario: **el motor sigue sin red**. La ubicación es el GPS del
+móvil o, si no hay permiso, una ciudad guardada en `localStorage`.
+
+Los planes (`plans`) apuntan un conjunto o un par a un día; los ven los dos y
+solo quien lo apuntó lo borra. Se listan en `/calendario`.
 
 Nunca poner una contraseña real en un fixture de test: el repo es público.
 
 ## Base de datos
 
-Cuatro tablas: `garments`, `outfits`, `outfit_items`, `wear_log`. El esquema
-vive en `supabase/migrations/0001_init.sql`, es idempotente donde tiene
-sentido y se ejecuta pegándolo en el SQL Editor de Supabase.
+Seis tablas: `garments`, `outfits`, `outfit_items`, `wear_log`
+(`0001_init.sql`) y `couple_outfits`, `plans` (`0002_pareja_y_planes.sql`).
+Las migraciones viven en `supabase/migrations/`, son idempotentes donde tiene
+sentido y se ejecutan pegándolas en orden en el SQL Editor de Supabase.
 
 Las imágenes van al bucket público `garments` de Supabase Storage, en tres
 tamaños por prenda: `original.jpg`, `cutout.png` (1024² transparente) y
 `thumb.webp` (320²).
 
-RLS está activado en las cuatro tablas y **no hay políticas**: el servidor usa
+RLS está activado en todas las tablas y **no hay políticas**: el servidor usa
 la secret key, que se salta RLS, y así la Data API no queda abierta con la
 clave anon. Si algún día hay login, habrá que escribir políticas.
 
@@ -150,6 +165,7 @@ Vitest, sin framework de mocks más allá de `vi.spyOn(globalThis, "fetch")`.
 
 - `color`, `rules`, `generator`, `evaluate`, `schema`, `image` — lógica pura, sin red.
 - `tagging`, `explain` — el `fetch` a Gemini interceptado.
+- `weather` — temporada por hemisferio, previsión frente a estimación, y el `fetch` a Open-Meteo interceptado.
 - `middleware` — la puerta de Basic Auth.
 
 ## Despliegue

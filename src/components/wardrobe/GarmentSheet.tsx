@@ -47,9 +47,11 @@ export interface GarmentSheetProps {
   /** Sin `onArchive` ni `onDelete` la ficha es de solo lectura (armario del otro). */
   onArchive?: (garment: Garment, archived: boolean) => Promise<void>;
   onDelete?: (garment: Garment) => Promise<void>;
+  /** Registra que se lleva hoy; vale también para una prenda del otro. */
+  onWear?: (garment: Garment) => Promise<void>;
 }
 
-export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentSheetProps) {
+export function GarmentSheet({ garment, onClose, onArchive, onDelete, onWear }: GarmentSheetProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -140,6 +142,12 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
           )}
 
           <div className="flex flex-col gap-2">
+            {onWear !== undefined && (
+              <Button size="lg" disabled={busy} onClick={() => void run(() => onWear(garment))}>
+                Me la pongo hoy
+              </Button>
+            )}
+
             {onArchive !== undefined && (
               <Button
                 variant="secondary"

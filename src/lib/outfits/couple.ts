@@ -61,7 +61,9 @@ function scorePair(mine: Outfit, theirs: Outfit): CoupleOutfit {
     id: `${mine.id}+${theirs.id}`,
     mine,
     theirs,
+    name: null,
     score: OWN_WEIGHT * own + COORDINATION_WEIGHT * coordination,
+    isFavorite: false,
     rationale: `${COLOR_PHRASES[harmony.kind]}, ${formalityGap < 0.75 ? "con el mismo nivel de arreglo" : "uno algo más arreglado que el otro"}.`,
   };
 }

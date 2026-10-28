@@ -9,8 +9,10 @@
  */
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import { CoupleCard } from "@/components/outfits/CoupleCard";
+import { DayWeatherPicker, dayLabel, today } from "@/components/outfits/DayWeatherPicker";
 import { OutfitDeck } from "@/components/outfits/OutfitDeck";
 import { Button } from "@/components/ui/Button";
 import { Cabecera } from "@/components/ui/Cabecera";
@@ -18,10 +20,13 @@ import { Chip } from "@/components/ui/Chip";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
   ApiCallError,
+  addPlan,
   fetchOwners,
   generateCoupleOutfits,
   generateOutfits,
   logWear,
+  removeCoupleFavorite,
+  saveCoupleFavorite,
   saveFavorite,
 } from "@/lib/client-api";
 import {
@@ -30,6 +35,7 @@ import {
   type Formality,
   type Outfit,
   type OwnersInfo,
+  type Season,
 } from "@/lib/types";
 
 const OCCASIONS: Formality[] = [1, 2, 3, 4, 5];
@@ -49,6 +55,9 @@ export default function OutfitsPage() {
   const [occasion, setOccasion] = useState<Formality | null>(null);
   const [temperature, setTemperature] = useState<number | null>(null);
   const [useLlm, setUseLlm] = useState(false);
+  const [day, setDay] = useState(today);
+  const [season, setSeason] = useState<Season | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     // Sin segundo armario el selector de modo ni aparece.
@@ -64,7 +73,9 @@ export default function OutfitsPage() {
     const request = {
       ...(occasion !== null ? { occasion } : {}),
       ...(temperature !== null ? { temperatureC: temperature } : {}),
+      ...(season !== null ? { season } : {}),
       limit: 10,
+      useLlmRanking: useLlm,
     };
     try {
       if (mode === "pareja") {
@@ -72,7 +83,7 @@ export default function OutfitsPage() {
         setPairs(await generateCoupleOutfits(request));
       } else {
         setPairs([]);
-        setOutfits(await generateOutfits({ ...request, useLlmRanking: useLlm, mode }));
+        setOutfits(await generateOutfits({ ...request, mode }));
       }
     } catch (cause) {
       setOutfits([]);
@@ -92,11 +103,34 @@ export default function OutfitsPage() {
       const saved = await saveFavorite(outfit);
       const mark = (o: Outfit) => (o.id === outfit.id ? { ...o, ...saved, isFavorite: true } : o);
       setOutfits((current) => current.map(mark));
-      setPairs((current) => current.map((pair) => ({ ...pair, mine: mark(pair.mine) })));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "No se pudo guardar el favorito.");
     }
   }
+
+  /** El par se guarda entero; la tarjeta pasa a llevar el id guardado. */
+  async function favoritePair(pair: CoupleOutfit) {
+    try {
+      const saved = pair.isFavorite
+        ? (await removeCoupleFavorite(pair.id), { ...pair, isFavorite: false })
+        : await saveCoupleFavorite(pair);
+      setPairs((current) => current.map((p) => (p.id === pair.id ? saved : p)));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "No se pudo guardar el par.");
+    }
+  }
+
+  async function plan(target: { outfit: Outfit } | { couple: CoupleOutfit }) {
+    setNotice(null);
+    try {
+      await addPlan(day, target);
+      setNotice(`Apuntado para el ${dayLabel(day)}.`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "No se pudo apuntar.");
+    }
+  }
+
+  const planLabel = `Apuntar para el ${dayLabel(day)}`;
 
   async function wear(outfit: Outfit) {
     // Registrar cada prenda por separado alimenta la métrica de frescura, que
@@ -110,6 +144,11 @@ export default function OutfitsPage() {
         adorno="conjuntos"
         titulo="Conjuntos"
         subtitulo="Combinaciones hechas con lo que ya tienes."
+        accion={
+          <Link href="/calendario">
+            <Button variant="secondary">Calendario</Button>
+          </Link>
+        }
       />
 
       <section className="space-y-4 rounded-[28px] bg-surface p-4 shadow-[0_12px_30px_rgb(247_168_196_/_0.24)]">
@@ -131,6 +170,15 @@ export default function OutfitsPage() {
             </div>
           </fieldset>
         )}
+
+        <DayWeatherPicker
+          day={day}
+          onDayChange={setDay}
+          onWeather={(weather) => {
+            setTemperature(weather?.tempC ?? null);
+            setSeason(weather?.season ?? null);
+          }}
+        />
 
         <fieldset>
           <legend className="mb-2 text-sm font-bold text-ink">¿Para qué ocasión?</legend>
@@ -170,27 +218,31 @@ export default function OutfitsPage() {
           </div>
         </div>
 
-        {mode !== "pareja" && (
-          <label className="flex min-h-11 items-start gap-3 py-1 text-sm">
-            <input
-              type="checkbox"
-              checked={useLlm}
-              onChange={(event) => setUseLlm(event.target.checked)}
-              className="mt-0.5 h-5 w-5 shrink-0"
-            />
-            <span className="font-bold text-ink">
-              Afinar con IA
-              <span className="block font-medium text-xs text-neutral-500">
-                Claude reordena los cinco mejores y escribe el porqué. Tarda unos segundos más.
-              </span>
+        <label className="flex min-h-11 items-start gap-3 py-1 text-sm">
+          <input
+            type="checkbox"
+            checked={useLlm}
+            onChange={(event) => setUseLlm(event.target.checked)}
+            className="mt-0.5 h-5 w-5 shrink-0"
+          />
+          <span className="font-bold text-ink">
+            Afinar con IA
+            <span className="block font-medium text-xs text-neutral-500">
+              Claude reordena los cinco mejores y escribe el porqué. Tarda unos segundos más.
             </span>
-          </label>
-        )}
+          </span>
+        </label>
 
         <Button size="lg" className="w-full" onClick={() => void generate()} disabled={loading}>
           {loading ? "Combinando…" : "Generar conjuntos"}
         </Button>
       </section>
+
+      {notice !== null && (
+        <p role="status" className="rounded-[20px] bg-sky-50 p-4 text-sm font-semibold text-sky-700">
+          {notice} <Link href="/calendario" className="underline">Ver calendario</Link>
+        </p>
+      )}
 
       {error !== null && (
         <p role="alert" className="rounded-[20px] border-[1.5px] border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
@@ -205,8 +257,10 @@ export default function OutfitsPage() {
               key={pair.id}
               pair={pair}
               partnerName={partner.name}
-              onToggleFavorite={(outfit) => void favorite(outfit)}
+              onToggleFavorite={(p) => void favoritePair(p)}
               onWear={(outfit) => void wear(outfit)}
+              onPlan={(couple) => void plan({ couple })}
+              planLabel={planLabel}
             />
           ))}
         </div>
@@ -218,6 +272,8 @@ export default function OutfitsPage() {
           loading={loading}
           onToggleFavorite={(outfit) => void favorite(outfit)}
           onWear={(outfit) => void wear(outfit)}
+          onPlan={(outfit) => void plan({ outfit })}
+          planLabel={planLabel}
           {...(mode === "mezcla" && partner !== null
             ? { ajenas: { ownerId: partner.id, name: partner.name } }
             : {})}

@@ -15,7 +15,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import * as z from "zod/v4";
 
-import type { Outfit } from "@/lib/types";
+import type { CoupleOutfit, Outfit } from "@/lib/types";
 import { geminiJson, hasGemini } from "@/lib/ai/gemini";
 
 const DEFAULT_MODEL = "claude-opus-5";
@@ -56,50 +56,74 @@ Sé concreta y honesta: si algo no pega, dilo, con cariño pero dilo. Nunca
 inventes prendas que no estén en la lista. Devuelve todos los conjuntos que
 recibas, ninguno menos.`;
 
+const COUPLE_PROMPT = `${SYSTEM_PROMPT}
+
+Esta vez cada conjunto es un par: un look para cada persona de una pareja que
+va a salir junta. Valora sobre todo si los dos looks combinan entre sí sin ir
+disfrazados de iguales, y explica el porqué hablando a los dos ("vais...").`;
+
 /**
  * Devuelve los conjuntos reordenados y con textos del modelo.
  * Ante cualquier problema devuelve `outfits` sin tocar.
  */
 export async function explainOutfits(outfits: Outfit[]): Promise<Outfit[]> {
-  if (outfits.length === 0) return outfits;
-  if (!process.env.ANTHROPIC_API_KEY && !hasGemini()) return outfits;
+  return rewriteTop(outfits, SYSTEM_PROMPT, describeOutfits, (outfit, entry) => ({
+    ...outfit,
+    name: entry.name,
+    rationale: entry.rationale,
+    source: "rules+llm" as const,
+  }));
+}
 
-  const head = outfits.slice(0, TOP_N);
-  const tail = outfits.slice(TOP_N);
+/** Lo mismo para los pares de `/api/outfits/couple`. */
+export async function explainCouples(pairs: CoupleOutfit[]): Promise<CoupleOutfit[]> {
+  return rewriteTop(pairs, COUPLE_PROMPT, describeCouples, (pair, entry) => ({
+    ...pair,
+    name: entry.name,
+    rationale: entry.rationale,
+  }));
+}
+
+type Entry = z.infer<typeof RankingSchema>["outfits"][number];
+
+/** Manda el top al modelo, reordena con su criterio y deja el resto como estaba. */
+async function rewriteTop<T extends { id: string }>(
+  items: T[],
+  system: string,
+  describe: (items: T[]) => string,
+  apply: (item: T, entry: Entry) => T,
+): Promise<T[]> {
+  if (items.length === 0) return items;
+  if (!process.env.ANTHROPIC_API_KEY && !hasGemini()) return items;
+
+  const head = items.slice(0, TOP_N);
+  const tail = items.slice(TOP_N);
 
   try {
-    const parsed = await rank(describeOutfits(head));
-    if (parsed === null) return outfits;
+    const parsed = await rank(system, describe(head));
+    if (parsed === null) return items;
 
     const byId = new Map(parsed.outfits.map((entry) => [entry.id, entry]));
 
     const rewritten = head
-      .map((outfit) => {
-        const entry = byId.get(outfit.id);
-        if (entry === undefined) return { outfit, rank: Number.MAX_SAFE_INTEGER };
-        return {
-          outfit: {
-            ...outfit,
-            name: entry.name,
-            rationale: entry.rationale,
-            source: "rules+llm" as const,
-          },
-          rank: entry.rank,
-        };
+      .map((item) => {
+        const entry = byId.get(item.id);
+        if (entry === undefined) return { item, rank: Number.MAX_SAFE_INTEGER };
+        return { item: apply(item, entry), rank: entry.rank };
       })
       .sort((a, b) => a.rank - b.rank)
-      .map((entry) => entry.outfit);
+      .map((entry) => entry.item);
 
     return [...rewritten, ...tail];
   } catch {
     // Degradar en silencio es lo correcto aquí: el usuario sigue viendo sus
     // conjuntos, solo que con la explicación generada por reglas.
-    return outfits;
+    return items;
   }
 }
 
 /** Pregunta al modelo que haya configurado. Claude manda si están los dos. */
-async function rank(prompt: string): Promise<z.infer<typeof RankingSchema> | null> {
+async function rank(system: string, prompt: string): Promise<z.infer<typeof RankingSchema> | null> {
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
   if (anthropicKey) {
@@ -107,7 +131,7 @@ async function rank(prompt: string): Promise<z.infer<typeof RankingSchema> | nul
     const message = await client.messages.parse({
       model: process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL,
       max_tokens: 4000,
-      system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+      system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: prompt }],
       output_config: { format: zodOutputFormat(RankingSchema) },
     });
@@ -116,7 +140,7 @@ async function rank(prompt: string): Promise<z.infer<typeof RankingSchema> | nul
 
   return geminiJson(
     process.env.GEMINI_API_KEY as string,
-    SYSTEM_PROMPT,
+    system,
     [{ text: prompt }],
     RankingSchema,
   );
@@ -124,16 +148,24 @@ async function rank(prompt: string): Promise<z.infer<typeof RankingSchema> | nul
 
 /** Describe los conjuntos en texto plano, que es más barato en tokens que JSON. */
 function describeOutfits(outfits: Outfit[]): string {
-  return outfits
-    .map((outfit) => {
-      const prendas = outfit.items
-        .map((item) => {
-          const g = item.garment;
-          const color = g.colors[0]?.name || g.primaryHex;
-          return `  - ${item.slot}: ${g.subcategory}, ${color}, ${g.pattern}, formalidad ${g.formality}/5, abrigo ${g.warmth}/5${g.material ? `, ${g.material}` : ""}`;
-        })
-        .join("\n");
-      return `Conjunto ${outfit.id}\n${prendas}`;
-    })
+  return outfits.map((outfit) => `Conjunto ${outfit.id}\n${describeItems(outfit)}`).join("\n\n");
+}
+
+function describeCouples(pairs: CoupleOutfit[]): string {
+  return pairs
+    .map(
+      (pair) =>
+        `Conjunto ${pair.id}\n Look de una persona:\n${describeItems(pair.mine)}\n Look de la otra:\n${describeItems(pair.theirs)}`,
+    )
     .join("\n\n");
+}
+
+function describeItems(outfit: Outfit): string {
+  return outfit.items
+    .map((item) => {
+      const g = item.garment;
+      const color = g.colors[0]?.name || g.primaryHex;
+      return `  - ${item.slot}: ${g.subcategory}, ${color}, ${g.pattern}, formalidad ${g.formality}/5, abrigo ${g.warmth}/5${g.material ? `, ${g.material}` : ""}`;
+    })
+    .join("\n");
 }

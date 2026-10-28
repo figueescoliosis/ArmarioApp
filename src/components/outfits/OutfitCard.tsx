@@ -14,6 +14,9 @@ export interface OutfitCardProps {
   sello?: "a" | "b";
   /** En modo mezcla: de quién son las prendas que no son tuyas. */
   ajenas?: { ownerId: string; name: string };
+  /** Apuntar el conjunto en el calendario; `planLabel` dice para qué día. */
+  onPlan?: (outfit: Outfit) => void;
+  planLabel?: string;
 }
 
 /**
@@ -41,7 +44,15 @@ const BREAKDOWN_KEYS: Array<keyof ScoreBreakdown> = [
   "freshness",
 ];
 
-export function OutfitCard({ outfit, onToggleFavorite, onWear, sello, ajenas }: OutfitCardProps) {
+export function OutfitCard({
+  outfit,
+  onToggleFavorite,
+  onWear,
+  sello,
+  ajenas,
+  onPlan,
+  planLabel,
+}: OutfitCardProps) {
   const [expanded, setExpanded] = useState(false);
   const percent = Math.round(outfit.score * 100);
   const prestadas =
@@ -129,6 +140,11 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear, sello, ajenas }: 
       <Button variant="primary" size="lg" className="w-full" onClick={() => onWear?.(outfit)}>
         Me lo pongo hoy
       </Button>
+      {onPlan !== undefined && (
+        <Button variant="secondary" size="lg" className="w-full" onClick={() => onPlan(outfit)}>
+          {planLabel ?? "Apuntar en el calendario"}
+        </Button>
+      )}
     </article>
   );
 }
