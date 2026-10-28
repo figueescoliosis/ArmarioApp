@@ -2,8 +2,10 @@
 
 PWA que cataloga el armario de una persona a partir de fotos: recorta el
 fondo, etiqueta cada prenda con IA y genera conjuntos combinando lo que hay
-guardado. No tiene login: todo el armario pertenece a un único usuario
-implícito.
+guardado. No tiene login: dos personas entran cada una con su usuario del
+Basic Auth y tienen su propio armario. Pueden ver el del otro, combinar los
+dos, buscar conjuntos a juego y apuntarlos en un calendario según el tiempo
+de ese día.
 
 ## Arrancar
 
@@ -49,11 +51,14 @@ armario ──▶ motor de reglas (determinista, sin red) ──▶ conjuntos pu
 ## Estructura de `src/`
 
 - **`app/`** — rutas de Next.js (App Router). Páginas: `/` (portada),
-  `/subir` (dar de alta una prenda), `/armario` (rejilla del armario),
-  `/outfits` (generar conjuntos), `/favoritos` (conjuntos guardados). Bajo
-  `api/` viven los Route Handlers: `garments/`, `garments/[id]`,
-  `garments/[id]/wear`, `garments/analyze`, `outfits/generate` y
-  `outfits/favorites`.
+  `/subir` (dar de alta una o varias prendas), `/armario` (el mío o el del
+  otro), `/outfits` (generar conjuntos para un día, solo, a juego o
+  mezclando), `/calendario` (planes de los dos), `/favoritos` (conjuntos y
+  pares guardados), `/probador`. Bajo `api/` viven los Route Handlers:
+  `garments/`, `garments/[id]`, `garments/[id]/wear`, `garments/analyze`,
+  `outfits/generate`, `outfits/couple`, `outfits/couple/favorites`,
+  `outfits/favorites`, `outfits/critique`, `plans`, `weather`, `owners`,
+  `wear` y `cron/ping`.
 - **`components/`** — componentes de React. `ui/` tiene los básicos
   reutilizables (botón, spinner, chip, estado vacío); `upload/` cubre el
   flujo de subida (captura de foto, recorte manual, revisión de etiquetas);
@@ -73,13 +78,18 @@ armario ──▶ motor de reglas (determinista, sin red) ──▶ conjuntos pu
 - **`lib/db/`** — acceso a Supabase. `supabase.ts` crea el cliente admin y
   gestiona el bucket de Storage; `schema.ts` traduce entre las filas
   snake_case de Postgres y los tipos de dominio; `garments.ts` y
-  `outfits.ts` son las operaciones CRUD sobre cada tabla.
+  `outfits.ts` (con los pares) y `plans.ts` son las operaciones CRUD.
+- **`lib/weather.ts`** — el tiempo de un día con Open-Meteo, sin clave:
+  previsión a 15 días y, más allá, el mismo día de un año pasado.
+- **`lib/owners.ts`** — los dos dueños de armario que salen de las variables
+  del Basic Auth.
 - **`lib/outfits/`** — el motor de conjuntos. `rules.ts` define qué huecos
   hay que llenar y qué combinaciones son imposibles; `color.ts` es la teoría
   del color (RGB/HSL/CIELAB) que mide armonía entre prendas; `generator.ts`
-  hace la búsqueda combinatoria con poda; `signature.ts` calcula el hash
+  hace la búsqueda combinatoria con poda; `couple.ts` empareja looks de los
+  dos armarios; `signature.ts` calcula el hash
   estable de un conjunto; `explain.ts` es el paso opcional que deja a un
-  modelo reordenar y redactar el top 5.
+  modelo reordenar y redactar el top 5 (también de los pares).
 - **`lib/types.ts`** — el contrato de tipos de toda la app: todo lo que cruza
   una frontera (cliente↔API, API↔base de datos) se define aquí una sola vez.
 - **`lib/errors.ts`**, **`lib/api.ts`** — manejo de errores uniforme:
@@ -91,7 +101,8 @@ armario ──▶ motor de reglas (determinista, sin red) ──▶ conjuntos pu
 - **`lib/pwa.ts`** — registro del service worker, solo en producción.
 - **`middleware.ts`** — Basic Auth delante de toda la app cuando
   `APP_PASSWORD` está puesta. La app no tiene login, así que es lo único que
-  separa un despliegue público de un armario abierto a cualquiera.
+  separa un despliegue público de un armario abierto a cualquiera. El
+  usuario con el que se entra decide el armario (cabecera `x-owner-id`).
 
 ## Arquitectura
 
@@ -147,4 +158,6 @@ Ver `docs/SETUP-APIS.md` para el paso a paso de cómo obtener cada valor.
 | `ANTHROPIC_MODEL` | No (por defecto `claude-opus-5`) | Cambia el modelo de Claude usado |
 | `GEMINI_API_KEY` | Sí, si el proveedor es `gemini` | Clave de Google AI Studio. Es la única con cuota gratuita sin tarjeta |
 | `GEMINI_MODEL` | No (por defecto `gemini-3.5-flash`) | Cambia el modelo de Gemini usado |
-| `APP_PASSWORD` | Solo en despliegue | Contraseña de acceso (usuario `admin`). Vacía en local no pide nada |
+| `APP_USER` / `APP_PASSWORD` | Solo en despliegue | Usuario y contraseña del primer armario (el de siempre). Vacía en local no pide nada |
+| `APP_USER_2` / `APP_PASSWORD_2` | No | Segundo armario. Sin ellas la app es de una sola persona |
+| `CRON_SECRET` | En Vercel | Protege `/api/cron/ping`, el cron diario que evita que Supabase pause el proyecto |

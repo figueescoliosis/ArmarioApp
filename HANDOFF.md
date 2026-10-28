@@ -1,16 +1,22 @@
 # Handoff
 
 Estado del proyecto: desplegado y funcionando de punta a punta con datos
-reales. Tipos, lint y 109 tests en verde.
+reales. Tipos, lint y 139 tests en verde. Última actualización: 28-10-2026.
+
+Producción: https://armario-app-gamma.vercel.app (Vercel `figueroa22/armario-app`;
+`armario-app.vercel.app` es de otra persona). Dos armarios: coni
+(`APP_USER`, dueño `default`) y Benjamin (`APP_USER_2`, dueño `benjamin`).
 
 ## Estado de los servicios
 
 | Pieza | Servicio | Estado |
 |---|---|---|
-| Base de datos y Storage | Supabase, plan Free, West EU (Ireland) | Migración aplicada, 4 tablas con RLS, bucket público `garments` |
+| Base de datos y Storage | Supabase, plan Free, West EU (Ireland) | Migraciones 0001 y 0002 aplicadas, 6 tablas con RLS, bucket público `garments` |
 | Recorte de fondo | remove.bg | Funcionando. 50 imágenes al mes gratis, a 0,25 MP |
 | Etiquetado y redacción | Google Gemini (AI Studio) | Funcionando. Cuota diaria gratuita, sin tarjeta |
-| Hosting | Vercel, plan Hobby | Desplegado, con Basic Auth delante |
+| Hosting | Vercel, plan Hobby | Desplegado, con Basic Auth delante (dos usuarios) |
+| Tiempo | Open-Meteo | Sin clave ni cuenta |
+| Cron | Vercel Cron, 09:00 UTC diario | Hace ping a Supabase para que no se pause |
 
 La combinación elegida no cuesta nada. Ni fal.ai ni Anthropic tienen plan
 gratuito, y por eso se añadieron `removebg` y `gemini` como proveedores: el
@@ -57,7 +63,20 @@ Probado contra los servicios reales, no solo compilado:
   1,2 s + modelo 5,1 s + subida 0,9 s), muy por debajo del límite de 60 s de
   las funciones de Vercel. En local va entre 9 y 14 s.
 
+- **Dos armarios en producción**: cada usuario ve solo lo suyo, «De …» muestra
+  el del otro en solo lectura, credenciales cruzadas dan 401 y una cabecera
+  `x-owner-id` falsificada se ignora.
+- **Tiempo**: previsión por GPS y por ciudad, estimación a más de 15 días,
+  ciudad inexistente con error legible.
+- **Planes**: apuntar, que el otro lo vea y que solo quien lo apuntó pueda
+  borrarlo (probado con un plan que luego se borró).
+- **Cron**: 200 con el secreto, 401 sin él.
+
 Sin verificar:
+
+- Pares a juego, mezcla y pares favoritos con datos reales: Benjamin aún no
+  tiene prendas (hacen falta al menos 2 en cada armario).
+- La subida múltiple con fotos reales (gasta cuota de remove.bg y Gemini).
 
 - Los proveedores de pago (fal.ai, Photoroom, Anthropic): el código está
   escrito y tipado, pero nunca se ha ejecutado con una clave activa.
@@ -67,6 +86,17 @@ Sin verificar:
   probado con cinco prendas.
 
 ## Deuda conocida
+
+- **Supabase Free pausa el proyecto tras ~7 días sin actividad** (el dominio
+  deja de resolver y la API responde 500 «fetch failed»). El cron diario lo
+  evita; si aun así se pausa, se restaura desde el panel de Supabase.
+- **Las variables de Vercel se leen en el build**: cambiar una exige
+  redesplegar. En Vercel quedan `APP_USER2`/`APP_PASSWORD2` (sin guion bajo)
+  de un primer intento; no las usa nada y se pueden borrar.
+- **La lluvia solo se muestra**, no puntúa en el motor (comentario
+  `ponytail:` pendiente si se quiere que prime el abrigo impermeable).
+- **Storage tiene carpetas huérfanas** de prendas borradas o subidas que no se
+  llegaron a guardar.
 
 - **`panconpalta` quedó en el commit `14b77a4`**, cuando el repo aún era
   privado, por usar la contraseña real como fixture del test del middleware.
@@ -81,12 +111,14 @@ Sin verificar:
 
 ## Siguientes pasos naturales
 
-- **Registrar el uso desde `/armario`.** El botón «Me lo pongo hoy» ya existe
-  en `/outfits`, `/favoritos` y `/probador`, así que `freshnessScore` ya recibe
-  datos; falta poder anotar una prenda suelta desde la rejilla del armario.
+- **Llenar los dos armarios** con la subida múltiple y probar a juego,
+  mezcla, pares favoritos y planes con datos reales.
+- **Limpiar las carpetas huérfanas de Storage.**
+- **Avisos de los planes** (notificación la víspera) y una vista de mes en
+  `/calendario`, que hoy es una lista por días.
 - **Login con Supabase Auth.** Todas las tablas llevan `owner_id` con valor
-  por defecto `'default'`, pensado para que pasar a multiusuario sea sustituir
-  `DEFAULT_OWNER_ID` por el usuario autenticado sin tocar el esquema. Haría
+  por defecto `'default'`, y `currentOwnerId()` ya centraliza de quién es
+  cada petición: pasar a login real es cambiar de dónde sale ese id. Haría
   falta escribir políticas RLS, que hoy no existen. Eso permitiría además
   quitar el Basic Auth del middleware.
 - **Ajustar la matriz de compatibilidad** (`src/lib/outfits/rules.ts`) con los
