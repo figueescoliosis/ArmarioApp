@@ -9,32 +9,46 @@
  * Sin `APP_PASSWORD` no pide nada, para que `npm run dev` en local siga siendo
  * inmediato. En el despliegue la variable es obligatoria. El usuario sale de
  * `APP_USER`, y si no está, de "admin".
+ *
+ * Hay un segundo par opcional (`APP_USER_2`/`APP_PASSWORD_2`) para un segundo
+ * armario: quien entra decide de quién es el armario que ve. El middleware lo
+ * pasa a las rutas en la cabecera `x-owner-id`, que **siempre** sobrescribe:
+ * si dejara pasar la del cliente, cualquiera podría leer el armario del otro.
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { DEFAULT_OWNER_ID, OWNER_HEADER, owners } from "@/lib/owners";
 
 export function middleware(request: NextRequest) {
-  const expected = process.env.APP_PASSWORD;
-  if (!expected) return NextResponse.next();
-
-  // El usuario también es configurable; "admin" es lo que había antes de que
-  // lo fuera, así que un despliegue sin `APP_USER` sigue funcionando igual.
-  const expectedUser = process.env.APP_USER || "admin";
+  // Sin `APP_PASSWORD` no hay puerta (local): todo es del dueño por defecto.
+  if (!process.env.APP_PASSWORD) return asOwner(request, DEFAULT_OWNER_ID);
 
   const header = request.headers.get("authorization");
 
   if (header?.startsWith("Basic ")) {
     // atob en vez de Buffer: el middleware corre en el runtime Edge.
     const [user, ...rest] = atob(header.slice(6)).split(":");
-    if (user === expectedUser && timingSafeEqual(rest.join(":"), expected)) {
-      return NextResponse.next();
+    const password = rest.join(":");
+    // Se comprueban todos sin cortar al primero que acierta, para que el
+    // tiempo de respuesta no delate cuál de los usuarios existe.
+    let matched: string | null = null;
+    for (const owner of owners()) {
+      if (timingSafeEqual(password, owner.password) && user === owner.name) matched = owner.id;
     }
+    if (matched !== null) return asOwner(request, matched);
   }
 
   return new NextResponse("Acceso restringido.", {
     status: 401,
     headers: { "WWW-Authenticate": 'Basic realm="Armario Inteligente", charset="UTF-8"' },
   });
+}
+
+/** Deja pasar la petición con el dueño fijado, pise lo que pise el cliente. */
+function asOwner(request: NextRequest, ownerId: string) {
+  const headers = new Headers(request.headers);
+  headers.set(OWNER_HEADER, ownerId);
+  return NextResponse.next({ request: { headers } });
 }
 
 /**

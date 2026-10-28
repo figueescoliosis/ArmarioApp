@@ -12,6 +12,8 @@ export interface OutfitDeckProps {
   loading?: boolean;
   /** Favoritos lleva el sello del diseño en cada tarjeta; Conjuntos no. */
   mostrarSello?: boolean;
+  /** En modo mezcla: marca en cada tarjeta las prendas del otro armario. */
+  ajenas?: { ownerId: string; name: string };
 }
 
 const CARD_GAP_PX = 16;
@@ -22,6 +24,7 @@ export function OutfitDeck({
   onWear,
   loading = false,
   mostrarSello = false,
+  ajenas,
 }: OutfitDeckProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -63,6 +66,7 @@ export function OutfitDeck({
               outfit={outfit}
               onToggleFavorite={onToggleFavorite}
               onWear={onWear}
+              {...(ajenas !== undefined ? { ajenas } : {})}
               {...(mostrarSello ? { sello: index % 2 === 0 ? "a" : "b" } : {})}
             />
           </div>

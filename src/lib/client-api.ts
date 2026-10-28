@@ -13,12 +13,14 @@ import type {
   AnalyzeGarmentResult,
   ApiError,
   ApiResponse,
+  CoupleOutfit,
   CreateGarmentResult,
   Garment,
   GarmentAttributes,
   GarmentUpdate,
   Outfit,
   OutfitRequest,
+  OwnersInfo,
 } from "@/lib/types";
 
 /** Error de API con el código y, si aplica, la variable de entorno que falta. */
@@ -48,11 +50,23 @@ async function unwrap<T>(response: Response): Promise<T> {
 
 /* ────────────────────────────── Prendas ────────────────────────────── */
 
-export async function fetchGarments(opts?: { archived?: boolean }): Promise<Garment[]> {
+export async function fetchGarments(opts?: {
+  archived?: boolean;
+  /** `partner` es el armario del otro, en solo lectura. */
+  owner?: "me" | "partner";
+}): Promise<Garment[]> {
   // Con `archived=true` la API devuelve archivadas **y** activas mezcladas:
   // quien quiera solo la papelera filtra por `garment.archived`.
-  const query = opts?.archived === true ? "?archived=true" : "";
+  const params = new URLSearchParams();
+  if (opts?.archived === true) params.set("archived", "true");
+  if (opts?.owner === "partner") params.set("owner", "partner");
+  const query = params.size > 0 ? `?${params}` : "";
   return unwrap<Garment[]>(await fetch(`/api/garments${query}`, { cache: "no-store" }));
+}
+
+/** Quién ha entrado y cómo se llama el otro armario, si lo hay. */
+export async function fetchOwners(): Promise<OwnersInfo> {
+  return unwrap<OwnersInfo>(await fetch("/api/owners", { cache: "no-store" }));
 }
 
 /** Paso 1: recorta, etiqueta y sube. No guarda todavía. */
@@ -109,6 +123,17 @@ export async function logWear(garmentId: string): Promise<void> {
 export async function generateOutfits(request: OutfitRequest = {}): Promise<Outfit[]> {
   return unwrap<Outfit[]>(
     await fetch("/api/outfits/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    }),
+  );
+}
+
+/** Un look de cada armario, emparejados para ir juntos. */
+export async function generateCoupleOutfits(request: OutfitRequest = {}): Promise<CoupleOutfit[]> {
+  return unwrap<CoupleOutfit[]>(
+    await fetch("/api/outfits/couple", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),

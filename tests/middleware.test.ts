@@ -50,3 +50,50 @@ describe("middleware", () => {
     expect(middleware(request("admin:pan:con:palta")).status).toBe(200);
   });
 });
+
+describe("middleware con dos armarios", () => {
+  function owner(response: Response) {
+    return response.headers.get("x-middleware-request-x-owner-id");
+  }
+
+  afterEach(() => {
+    delete process.env.APP_USER_2;
+    delete process.env.APP_PASSWORD_2;
+  });
+
+  it("cada usuario entra en su armario", () => {
+    process.env.APP_PASSWORD = "clave-uno";
+    process.env.APP_USER_2 = "Benja";
+    process.env.APP_PASSWORD_2 = "clave-dos";
+
+    expect(owner(middleware(request("admin:clave-uno")))).toBe("default");
+    expect(owner(middleware(request("Benja:clave-dos")))).toBe("benja");
+  });
+
+  it("no cruza usuarios y contraseñas", () => {
+    process.env.APP_PASSWORD = "clave-uno";
+    process.env.APP_USER_2 = "Benja";
+    process.env.APP_PASSWORD_2 = "clave-dos";
+
+    expect(middleware(request("admin:clave-dos")).status).toBe(401);
+    expect(middleware(request("Benja:clave-uno")).status).toBe(401);
+  });
+
+  it("ignora un x-owner-id mandado por el cliente", () => {
+    process.env.APP_PASSWORD = "clave-uno";
+    process.env.APP_USER_2 = "Benja";
+    process.env.APP_PASSWORD_2 = "clave-dos";
+
+    const forged = new NextRequest("https://armario.test/api/garments", {
+      headers: { authorization: `Basic ${btoa("admin:clave-uno")}`, "x-owner-id": "benja" },
+    });
+    expect(owner(middleware(forged))).toBe("default");
+
+    // Y en local, sin contraseña, tampoco.
+    delete process.env.APP_PASSWORD;
+    const local = new NextRequest("https://armario.test/api/garments", {
+      headers: { "x-owner-id": "benja" },
+    });
+    expect(owner(middleware(local))).toBe("default");
+  });
+});

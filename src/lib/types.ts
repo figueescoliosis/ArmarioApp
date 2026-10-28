@@ -199,6 +199,26 @@ export interface OutfitRequest {
   limit?: number;
   /** Si es `true`, Claude reordena y redacta las explicaciones del top 5. */
   useLlmRanking?: boolean;
+  /** `mezcla` combina prendas de los dos armarios en un mismo conjunto. */
+  mode?: "solo" | "mezcla";
+}
+
+/** Dos conjuntos, uno de cada armario, pensados para ir juntos. */
+export interface CoupleOutfit {
+  /** Determinista: los ids de los dos conjuntos unidos. */
+  id: string;
+  mine: Outfit;
+  theirs: Outfit;
+  /** Puntuación del par 0-1: lo bueno de cada look más lo bien que combinan. */
+  score: number;
+  /** Lo que tienen los dos looks en común, redactado por reglas. */
+  rationale: string;
+}
+
+export interface OwnersInfo {
+  me: { id: string; name: string };
+  /** `null` si solo hay un armario configurado. */
+  partner: { id: string; name: string } | null;
 }
 
 /* ────────────────────────────── API ────────────────────────────── */

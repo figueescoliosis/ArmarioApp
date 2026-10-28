@@ -44,8 +44,9 @@ function Etiqueta({
 export interface GarmentSheetProps {
   garment: Garment | null;
   onClose: () => void;
-  onArchive: (garment: Garment, archived: boolean) => Promise<void>;
-  onDelete: (garment: Garment) => Promise<void>;
+  /** Sin `onArchive` ni `onDelete` la ficha es de solo lectura (armario del otro). */
+  onArchive?: (garment: Garment, archived: boolean) => Promise<void>;
+  onDelete?: (garment: Garment) => Promise<void>;
 }
 
 export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentSheetProps) {
@@ -139,30 +140,34 @@ export function GarmentSheet({ garment, onClose, onArchive, onDelete }: GarmentS
           )}
 
           <div className="flex flex-col gap-2">
-            <Button
-              variant="secondary"
-              size="lg"
-              disabled={busy}
-              onClick={() => void run(() => onArchive(garment, !garment.archived))}
-            >
-              {garment.archived ? "Restaurar al armario" : "Archivar"}
-            </Button>
+            {onArchive !== undefined && (
+              <Button
+                variant="secondary"
+                size="lg"
+                disabled={busy}
+                onClick={() => void run(() => onArchive(garment, !garment.archived))}
+              >
+                {garment.archived ? "Restaurar al armario" : "Archivar"}
+              </Button>
+            )}
 
-            <Button
-              variant="danger"
-              size="lg"
-              disabled={busy}
-              onClick={() => {
-                if (!confirming) {
-                  setConfirming(true);
-                  return;
-                }
-                void run(() => onDelete(garment));
-              }}
-            >
-              <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-red-500" />
-              {confirming ? "¿Seguro? Toca otra vez" : "Eliminar para siempre"}
-            </Button>
+            {onDelete !== undefined && (
+              <Button
+                variant="danger"
+                size="lg"
+                disabled={busy}
+                onClick={() => {
+                  if (!confirming) {
+                    setConfirming(true);
+                    return;
+                  }
+                  void run(() => onDelete(garment));
+                }}
+              >
+                <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-red-500" />
+                {confirming ? "¿Seguro? Toca otra vez" : "Eliminar para siempre"}
+              </Button>
+            )}
 
             <Button variant="ghost" size="lg" disabled={busy} onClick={onClose}>
               Cerrar

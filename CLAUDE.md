@@ -13,7 +13,7 @@ recoge lo que hace falta para *cambiar* el código sin romper nada.
 
 ```bash
 npm run dev        # desarrollo en http://localhost:3000
-npm run test       # Vitest, 109 tests, ninguno toca la red
+npm run test       # Vitest, 130 tests, ninguno toca la red
 npm run typecheck  # tsc --noEmit
 npm run lint       # ESLint
 npm run build      # build de producción (más estricto que typecheck, ver abajo)
@@ -100,17 +100,31 @@ El modelo de Gemini está fijado a una versión concreta
 saturación. Hay un comentario `ponytail:` en `src/lib/ai/gemini.ts` con el
 camino de vuelta al alias.
 
-## Sin login
+## Sin login: dos armarios por Basic Auth
 
-No hay usuarios. Todas las filas cuelgan de `DEFAULT_OWNER_ID = "default"`
-(`src/lib/db/supabase.ts`), centralizado ahí para que añadir multiusuario sea
-un cambio en un solo sitio.
+No hay cuentas. `src/middleware.ts` pone un Basic Auth delante de todo, y el
+usuario con el que se entra decide el armario (`src/lib/owners.ts`):
 
-Como consecuencia, `src/middleware.ts` pone un Basic Auth (usuario `admin`,
-contraseña en `APP_PASSWORD`) delante de todo. Sin esa variable no pide nada,
-que es lo cómodo en local; **en cualquier despliegue es obligatoria**, porque
-si no cualquiera que dé con la URL ve el armario, borra prendas y gasta las
-cuotas de los servicios externos.
+| Variables | Dueño (`owner_id`) |
+|---|---|
+| `APP_USER` / `APP_PASSWORD` | `"default"` (los datos de siempre) |
+| `APP_USER_2` / `APP_PASSWORD_2` (opcional) | `APP_USER_2` en minúsculas |
+
+El middleware pasa el dueño a las rutas en la cabecera `x-owner-id`, **siempre
+sobrescrita** (también en local), y `currentOwnerId()` de
+`src/lib/db/supabase.ts` la lee. La capa de datos filtra todo por ese dueño;
+el armario del otro solo se lee, vía `?owner=partner` o los modos de pareja,
+y su id sale siempre de `owners()`, nunca del cliente.
+
+Sin `APP_PASSWORD` no pide nada y todo es de `"default"`, que es lo cómodo en
+local; **en cualquier despliegue es obligatoria**, porque si no cualquiera que
+dé con la URL ve el armario, borra prendas y gasta las cuotas de los servicios
+externos.
+
+Conjuntos con los dos armarios, en `/outfits`: «Mezclar» pasa la unión de los
+dos armarios al generador (`mode: "mezcla"`); «A juego» genera el top de cada
+uno y los empareja con `src/lib/outfits/couple.ts` (`/api/outfits/couple`),
+puro y determinista como el generador.
 
 Nunca poner una contraseña real en un fixture de test: el repo es público.
 

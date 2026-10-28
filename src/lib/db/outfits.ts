@@ -1,6 +1,6 @@
 import type { Outfit } from "@/lib/types";
 import { computeSignature } from "@/lib/outfits/signature";
-import { DEFAULT_OWNER_ID, getSupabaseAdmin } from "@/lib/db/supabase";
+import { currentOwnerId, getSupabaseAdmin } from "@/lib/db/supabase";
 import {
   outfitToRow,
   rowToOutfit,
@@ -28,7 +28,7 @@ export async function saveOutfit(outfit: Outfit): Promise<Outfit> {
   const garmentIds = outfit.items.map((item) => item.garment.id);
   const signature = computeSignature(garmentIds);
 
-  const row = outfitToRow(outfit, DEFAULT_OWNER_ID, signature);
+  const row = outfitToRow(outfit, await currentOwnerId(), signature);
   const { data: inserted, error: insertError } = await client
     .from(OUTFITS_TABLE)
     .insert(row)
@@ -72,7 +72,7 @@ async function getOutfitById(id: string): Promise<Outfit | null> {
   const { data, error } = await client
     .from(OUTFITS_TABLE)
     .select(OUTFIT_WITH_ITEMS_SELECT)
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", id)
     .maybeSingle();
 
@@ -89,7 +89,7 @@ async function getOutfitBySignature(signature: string): Promise<Outfit | null> {
   const { data, error } = await client
     .from(OUTFITS_TABLE)
     .select(OUTFIT_WITH_ITEMS_SELECT)
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("signature", signature)
     .maybeSingle();
 
@@ -106,7 +106,7 @@ export async function listFavorites(): Promise<Outfit[]> {
   const { data, error } = await client
     .from(OUTFITS_TABLE)
     .select(OUTFIT_WITH_ITEMS_SELECT)
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("is_favorite", true)
     .order("created_at", { ascending: false });
 
@@ -122,7 +122,7 @@ export async function setFavorite(outfitId: string, isFavorite: boolean): Promis
   const { error } = await client
     .from(OUTFITS_TABLE)
     .update({ is_favorite: isFavorite })
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", outfitId);
 
   if (error) {
@@ -135,7 +135,7 @@ export async function deleteOutfit(id: string): Promise<void> {
   const { error } = await client
     .from(OUTFITS_TABLE)
     .delete()
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", id);
 
   if (error) {

@@ -10,6 +10,8 @@
 import { NextRequest } from "next/server";
 import { fail, handle, ok } from "@/lib/api";
 import { insertGarment, listGarments } from "@/lib/db/garments";
+import { currentOwnerId } from "@/lib/db/supabase";
+import { partnerOf } from "@/lib/owners";
 import {
   CATEGORIES,
   PATTERNS,
@@ -28,6 +30,14 @@ export async function GET(request: NextRequest) {
         : undefined;
 
     const includeArchived = request.nextUrl.searchParams.get("archived") === "true";
+
+    // `?owner=partner` es el armario del otro, en solo lectura. El id sale de
+    // la configuración, no del cliente: no se puede pedir un armario cualquiera.
+    if (request.nextUrl.searchParams.get("owner") === "partner") {
+      const partner = partnerOf(await currentOwnerId());
+      if (partner === null) return fail("NOT_FOUND", "No hay un segundo armario configurado.");
+      return ok(await listGarments({ category, includeArchived, ownerIds: [partner.id] }));
+    }
 
     return ok(await listGarments({ category, includeArchived }));
   });

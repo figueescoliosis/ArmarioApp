@@ -9,8 +9,8 @@ import { GarmentSheet } from "@/components/wardrobe/GarmentSheet";
 import { Button } from "@/components/ui/Button";
 import { Cabecera } from "@/components/ui/Cabecera";
 import { Chip } from "@/components/ui/Chip";
-import { deleteGarment, fetchGarments, updateGarment } from "@/lib/client-api";
-import { CATEGORIES, type Category, type Garment } from "@/lib/types";
+import { deleteGarment, fetchGarments, fetchOwners, updateGarment } from "@/lib/client-api";
+import { CATEGORIES, type Category, type Garment, type OwnersInfo } from "@/lib/types";
 
 export default function ArmarioPage() {
   const [garments, setGarments] = useState<Garment[]>([]);
@@ -19,11 +19,19 @@ export default function ArmarioPage() {
   const [filter, setFilter] = useState<Category | "all">("all");
   const [showArchived, setShowArchived] = useState(false);
   const [detail, setDetail] = useState<Garment | null>(null);
+  const [owners, setOwners] = useState<OwnersInfo | null>(null);
+  // El armario del otro se mira, no se toca: sin añadir, archivar ni borrar.
+  const [partnerView, setPartnerView] = useState(false);
 
-  const load = useCallback((archived: boolean) => {
+  useEffect(() => {
+    // Si falla, la página sigue siendo el armario propio de siempre.
+    fetchOwners().then(setOwners, () => undefined);
+  }, []);
+
+  const load = useCallback((archived: boolean, partner: boolean) => {
     // La API con `archived=true` devuelve todas mezcladas: la papelera se
     // queda solo con las archivadas y el armario con el resto.
-    return fetchGarments(archived ? { archived: true } : undefined)
+    return fetchGarments({ archived, owner: partner ? "partner" : "me" })
       .then((data) => setGarments(archived ? data.filter((g) => g.archived) : data))
       .catch((cause: unknown) => {
         setError(cause instanceof Error ? cause.message : "No se pudo cargar el armario.");
@@ -32,8 +40,8 @@ export default function ArmarioPage() {
   }, []);
 
   useEffect(() => {
-    void load(showArchived);
-  }, [load, showArchived]);
+    void load(showArchived, partnerView);
+  }, [load, showArchived, partnerView]);
 
   const counts = useMemo(() => {
     const result = { all: garments.length } as Record<Category | "all", number>;
@@ -44,6 +52,14 @@ export default function ArmarioPage() {
   }, [garments]);
 
   const visible = filter === "all" ? garments : garments.filter((g) => g.category === filter);
+
+  function switchOwner(partner: boolean) {
+    if (partner === partnerView) return;
+    setFilter("all");
+    setShowArchived(false);
+    setLoading(true);
+    setPartnerView(partner);
+  }
 
   /** Archivar o restaurar: la prenda cambia de lista, así que sale de esta. */
   async function archive(garment: Garment, archived: boolean) {
@@ -60,7 +76,13 @@ export default function ArmarioPage() {
     <div className="space-y-6">
       <Cabecera
         adorno="armario"
-        titulo={showArchived ? "Archivadas" : "Mi armario"}
+        titulo={
+          partnerView
+            ? `Armario de ${owners?.partner?.name ?? "tu pareja"}`
+            : showArchived
+              ? "Archivadas"
+              : "Mi armario"
+        }
         subtitulo={
           loading
             ? "Cargando…"
@@ -76,9 +98,11 @@ export default function ArmarioPage() {
             }
           : {})}
         accion={
-          <Link href="/subir">
-            <Button>Añadir</Button>
-          </Link>
+          partnerView ? undefined : (
+            <Link href="/subir">
+              <Button>Añadir</Button>
+            </Link>
+          )
         }
       />
 
@@ -88,19 +112,32 @@ export default function ArmarioPage() {
         </p>
       )}
 
+      {owners?.partner && (
+        <div className="flex flex-wrap gap-2" role="group" aria-label="De quién es el armario">
+          <Chip label="Mío" selected={!partnerView} onClick={() => switchOwner(false)} />
+          <Chip
+            label={`De ${owners.partner.name}`}
+            selected={partnerView}
+            onClick={() => switchOwner(true)}
+          />
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         {garments.length > 0 && (
           <CategoryFilter value={filter} counts={counts} onChange={setFilter} />
         )}
-        <Chip
-          label={showArchived ? "Ver armario" : "Archivadas"}
-          selected={showArchived}
-          onClick={() => {
-            setFilter("all");
-            setLoading(true);
-            setShowArchived((prev) => !prev);
-          }}
-        />
+        {!partnerView && (
+          <Chip
+            label={showArchived ? "Ver armario" : "Archivadas"}
+            selected={showArchived}
+            onClick={() => {
+              setFilter("all");
+              setLoading(true);
+              setShowArchived((prev) => !prev);
+            }}
+          />
+        )}
       </div>
 
       <GarmentGrid
@@ -109,7 +146,9 @@ export default function ArmarioPage() {
         onSelect={setDetail}
         adornos={{ 0: "a", 2: "c" }}
         emptyMessage={
-          showArchived
+          partnerView && garments.length === 0
+            ? `${owners?.partner?.name ?? "Tu pareja"} todavía no ha subido prendas.`
+            : showArchived
             ? "Aquí aparecen las prendas que archives."
             : garments.length === 0
               ? "Haz una foto a tu primera prenda y empieza a llenar el armario."
@@ -120,8 +159,7 @@ export default function ArmarioPage() {
       <GarmentSheet
         garment={detail}
         onClose={() => setDetail(null)}
-        onArchive={archive}
-        onDelete={remove}
+        {...(partnerView ? {} : { onArchive: archive, onDelete: remove })}
       />
     </div>
   );

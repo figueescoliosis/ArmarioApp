@@ -12,6 +12,8 @@ export interface OutfitCardProps {
   onWear?: (outfit: Outfit) => void;
   /** El sello de la lista de favoritos del diseño, alternado por tarjeta. */
   sello?: "a" | "b";
+  /** En modo mezcla: de quién son las prendas que no son tuyas. */
+  ajenas?: { ownerId: string; name: string };
 }
 
 /**
@@ -39,9 +41,13 @@ const BREAKDOWN_KEYS: Array<keyof ScoreBreakdown> = [
   "freshness",
 ];
 
-export function OutfitCard({ outfit, onToggleFavorite, onWear, sello }: OutfitCardProps) {
+export function OutfitCard({ outfit, onToggleFavorite, onWear, sello, ajenas }: OutfitCardProps) {
   const [expanded, setExpanded] = useState(false);
   const percent = Math.round(outfit.score * 100);
+  const prestadas =
+    ajenas === undefined
+      ? []
+      : outfit.items.filter((item) => item.garment.ownerId === ajenas.ownerId);
 
   return (
     <article className="flex flex-col gap-2.5">
@@ -58,20 +64,28 @@ export function OutfitCard({ outfit, onToggleFavorite, onWear, sello }: OutfitCa
 
           <div className="flex w-24 shrink-0 flex-col items-center gap-2.5">
             <ScoreRing percent={percent} size={80} />
-            <button
-              type="button"
-              aria-pressed={outfit.isFavorite}
-              aria-label={outfit.isFavorite ? "Quitar de favoritos" : "Marcar como favorito"}
-              onClick={() => onToggleFavorite?.(outfit)}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-bone-soft text-clay-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
-            >
-              <HeartIcon filled={outfit.isFavorite} />
-            </button>
+            {onToggleFavorite !== undefined && (
+              <button
+                type="button"
+                aria-pressed={outfit.isFavorite}
+                aria-label={outfit.isFavorite ? "Quitar de favoritos" : "Marcar como favorito"}
+                onClick={() => onToggleFavorite(outfit)}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-bone-soft text-clay-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-500"
+              >
+                <HeartIcon filled={outfit.isFavorite} />
+              </button>
+            )}
             {sello !== undefined && (
               <div aria-hidden="true" className={`adorno-conjunto-${sello}`} />
             )}
           </div>
         </div>
+
+        {ajenas !== undefined && prestadas.length > 0 && (
+          <p className="mt-2.5 rounded-full bg-lilac-50 px-3 py-2 text-xs font-semibold text-lilac-700">
+            De {ajenas.name}: {prestadas.map((item) => item.garment.subcategory).join(", ")}
+          </p>
+        )}
 
         <div className="mt-2.5 rounded-[20px] bg-amber-50 p-3">
           <p className="text-xs italic leading-relaxed text-amber-900">«{outfit.rationale}»</p>

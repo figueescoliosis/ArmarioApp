@@ -11,7 +11,9 @@ import { fail, handle, ok } from "@/lib/api";
 import { getLastWornMap, listGarments } from "@/lib/db/garments";
 import { generateOutfits } from "@/lib/outfits/generator";
 import { explainOutfits } from "@/lib/outfits/explain";
-import { SEASONS, type OutfitRequest, type Season } from "@/lib/types";
+import { sanitizeRequest } from "@/lib/outfits/request";
+import { currentOwnerId } from "@/lib/db/supabase";
+import { partnerOf } from "@/lib/owners";
 
 export const maxDuration = 60;
 
@@ -22,7 +24,15 @@ export async function POST(request: NextRequest) {
 
     const outfitRequest = sanitizeRequest(body);
 
-    const [garments, lastWorn] = await Promise.all([listGarments(), getLastWornMap()]);
+    // En modo mezcla entran los dos armarios; el motor no sabe de dueños.
+    const me = await currentOwnerId();
+    const partner = outfitRequest.mode === "mezcla" ? partnerOf(me) : null;
+    const ownerIds = partner === null ? [me] : [me, partner.id];
+
+    const [garments, lastWorn] = await Promise.all([
+      listGarments({ ownerIds }),
+      getLastWornMap(),
+    ]);
 
     if (garments.length < 2) {
       return fail(
@@ -44,30 +54,4 @@ export async function POST(request: NextRequest) {
 
     return ok(finalOutfits);
   });
-}
-
-function sanitizeRequest(body: Record<string, unknown>): OutfitRequest {
-  const request: OutfitRequest = {};
-
-  if (typeof body.occasion === "number" && body.occasion >= 1 && body.occasion <= 5) {
-    request.occasion = Math.round(body.occasion) as OutfitRequest["occasion"];
-  }
-  if (typeof body.temperatureC === "number" && Number.isFinite(body.temperatureC)) {
-    request.temperatureC = body.temperatureC;
-  }
-  if (typeof body.season === "string" && (SEASONS as readonly string[]).includes(body.season)) {
-    request.season = body.season as Season;
-  }
-  if (Array.isArray(body.mustIncludeIds)) {
-    request.mustIncludeIds = body.mustIncludeIds.filter((id): id is string => typeof id === "string");
-  }
-  if (Array.isArray(body.excludeIds)) {
-    request.excludeIds = body.excludeIds.filter((id): id is string => typeof id === "string");
-  }
-  if (typeof body.limit === "number" && body.limit > 0) {
-    request.limit = Math.min(30, Math.round(body.limit));
-  }
-  if (typeof body.useLlmRanking === "boolean") request.useLlmRanking = body.useLlmRanking;
-
-  return request;
 }

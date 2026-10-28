@@ -19,12 +19,19 @@ import { MissingConfigError } from "@/lib/errors";
 
 export { MissingConfigError };
 
+import { headers } from "next/headers";
+import { DEFAULT_OWNER_ID, OWNER_HEADER } from "@/lib/owners";
+
+export { DEFAULT_OWNER_ID };
+
 /**
- * La app no tiene login: todas las filas se guardan bajo este owner hasta que
- * exista multiusuario. Centralizarlo aquí hace esa migración un cambio de un
- * solo sitio.
+ * El dueño del armario de esta petición. Lo fija el middleware según quién
+ * entró por el Basic Auth (ver `src/lib/owners.ts`); sin cabecera (fuera de
+ * una petición o sin middleware) es el dueño por defecto.
  */
-export const DEFAULT_OWNER_ID = "default";
+export async function currentOwnerId(): Promise<string> {
+  return (await headers()).get(OWNER_HEADER) ?? DEFAULT_OWNER_ID;
+}
 
 export const GARMENTS_BUCKET = "garments";
 

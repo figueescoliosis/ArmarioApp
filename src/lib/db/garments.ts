@@ -1,5 +1,5 @@
 import type { Category, Garment, GarmentAttributes, GarmentUpdate } from "@/lib/types";
-import { DEFAULT_OWNER_ID, deleteImages, getSupabaseAdmin } from "@/lib/db/supabase";
+import { currentOwnerId, deleteImages, getSupabaseAdmin } from "@/lib/db/supabase";
 import {
   garmentToRow,
   rowToGarment,
@@ -14,12 +14,17 @@ const TABLE = "garments";
 export async function listGarments(opts?: {
   category?: Category;
   includeArchived?: boolean;
+  /**
+   * Armarios a leer; por defecto, el del dueño de la petición. Quien lo pasa
+   * tiene que sacarlo de `owners()`, nunca de lo que mande el cliente.
+   */
+  ownerIds?: string[];
 }): Promise<Garment[]> {
   const client = getSupabaseAdmin();
   let query = client
     .from(TABLE)
     .select("*")
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .in("owner_id", opts?.ownerIds ?? [await currentOwnerId()])
     .order("created_at", { ascending: false });
 
   if (opts?.category) {
@@ -42,7 +47,7 @@ export async function getGarment(id: string): Promise<Garment | null> {
   const { data, error } = await client
     .from(TABLE)
     .select("*")
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", id)
     .maybeSingle();
 
@@ -71,7 +76,7 @@ export async function insertGarment(input: {
     thumbUrl: input.thumbUrl,
     primaryHex,
     isNeutral,
-    ownerId: DEFAULT_OWNER_ID,
+    ownerId: await currentOwnerId(),
   });
 
   const client = getSupabaseAdmin();
@@ -114,7 +119,7 @@ export async function updateGarment(id: string, patch: GarmentUpdate): Promise<G
   const { data, error } = await client
     .from(TABLE)
     .update(row)
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", id)
     .select("*")
     .single();
@@ -132,7 +137,7 @@ export async function deleteGarment(id: string): Promise<void> {
   const { data: existing, error: fetchError } = await client
     .from(TABLE)
     .select("image_url, cutout_url, thumb_url")
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", id)
     .maybeSingle();
 
@@ -144,7 +149,7 @@ export async function deleteGarment(id: string): Promise<void> {
   const { error: deleteError } = await client
     .from(TABLE)
     .delete()
-    .eq("owner_id", DEFAULT_OWNER_ID)
+    .eq("owner_id", await currentOwnerId())
     .eq("id", id);
 
   if (deleteError) {
