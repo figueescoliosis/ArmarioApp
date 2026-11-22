@@ -181,6 +181,17 @@ Dos cosas que muerden:
 - **Las variables de entorno se leen en el build.** Cambiar una en Vercel no
   hace nada hasta que se redespliega.
 
+## App Android (`android/`)
+
+`android/` es otra app, **Nosotros** (Kotlin + Compose + Glance): un álbum de
+fotos para dos con widget. No comparte código con la web; su `README.md` y su
+`SETUP.md` explican todo. Se compila con `cd android && ./gradlew
+assembleDebug` (necesita el Android SDK y `local.properties`). Puede usar el
+mismo proyecto de Supabase que el Armario: sus tablas (`albums`,
+`album_members`, `photos`) y su bucket (`nosotros`) no chocan con las de
+aquí, y a diferencia del Armario sí usa RLS con políticas (Auth anónimo).
+`.vercelignore` la deja fuera del despliegue.
+
 ## Idioma
 
 Todo el proyecto está en español: la interfaz, los comentarios, los mensajes

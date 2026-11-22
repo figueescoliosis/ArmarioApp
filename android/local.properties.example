@@ -1,0 +1,5 @@
+# Copia este archivo como local.properties (mismo directorio) y rellena.
+# local.properties está en .gitignore: nunca se sube al repo.
+sdk.dir=/ruta/a/Android/Sdk
+SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
+SUPABASE_KEY=sb_publishable_xxxxxxxxxxxxxxxx

@@ -7,6 +7,9 @@ Basic Auth y tienen su propio armario. Pueden ver el del otro, combinar los
 dos, buscar conjuntos a juego y apuntarlos en un calendario según el tiempo
 de ese día.
 
+> **App Android «Nosotros»** (álbum de fotos compartido con widget): vive en
+> [`android/`](android/README.md) y es independiente de esta web.
+
 ## Arrancar
 
 Requisitos: Node 20 o superior, y las claves de Supabase, un proveedor de

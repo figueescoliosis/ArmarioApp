@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Nosotros</string>
+    <string name="widget_small_label">Nosotros 2×2</string>
+    <string name="widget_wide_label">Nosotros 4×2</string>
+    <string name="widget_description">Sus fotos en rotación. Tócalo para pasar a la siguiente.</string>
+</resources>
